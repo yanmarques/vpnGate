@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        {% block default_meta %}
+            <meta name="og:url" content={{ url_for('requests.index') }}>
+        {% endblock %}
+
+        {% block meta %}{% endblock %}
+
+        {% block title%}<title>{{ config['APP_NAME'] }}</title>{% endblock %}
+
+        <!-- Styles -->
+        <link href={{ url_for('static', filename='css/layout.css') }} rel="stylesheet">
+        {% block styles %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>
