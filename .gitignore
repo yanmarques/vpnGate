@@ -1,6 +1,7 @@
 __pycache__
 .pytest_cache
 .vscode
-.env
+.request_env
+.panel_env
 *.db
 venv

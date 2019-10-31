@@ -1,0 +1,30 @@
+{% extends 'layout.html.j2' %}
+
+{% block default_meta %}
+    <meta name="og:url" content={{ url_for('control.index') }}>
+{% endblock %}
+
+{% block styles %}
+    <link href={{ url_for('static', filename='css/panel.css') }} rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <h1>Hi there!</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Requested-Date</th>
+            <th>Status</th>
+        </tr>
+
+        {% for rqst in requests %}
+            <tr>
+                <td>{{ rqst.id }}</td>
+                <td>{{ rqst.email }}</td>
+                <td>{{ rqst.created_at }}</td>
+                <td>{{ 'accepted' if rqst.accepted else 'denied' }}</td>
+            </tr>
+        {% endfor %}
+    </table> 
+{% endblock %}

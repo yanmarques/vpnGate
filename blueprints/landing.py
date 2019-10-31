@@ -32,16 +32,20 @@ def register():
         conn = current_app.get_db()
         
         # retrieve last ID from db
-        cr_last_id = conn.cursor()
-        last_id = cr_last_id.lastrowid or 0
+        cr_last_id = conn.execute('select max(id) from request')
+        last_id = cr_last_id.fetchone()[0] or 0
         cr_last_id.close()
-        
+
         try:
+            print(last_id)
             conn.execute('insert into request (id,email) values (?,?)', (last_id + 1, email))
             conn.commit()
-            return render_template('success.html.j2') 
+            current_app.logger.debug('request created for: %s', email)
+            return render_template('success.html.j2')
         except sqlite3.IntegrityError as exception:
             if 'email' in str(exception):
                 form.email.errors.append(f"This email '{email}' was already been registered.")
+            else:
+                current_app.logger.error(str(exception))
 
     return index(form=form)

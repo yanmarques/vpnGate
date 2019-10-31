@@ -1,15 +1,15 @@
 import os
 
 import pytest
-import server
+import reg_server
 from sys_util import run_shell
 
 
 @pytest.fixture
 def client():
     # update running environment to load custom file
-    os.environ[server.DEFAULT_CONFIG_VAR] = 'tests/.env'
-    test_app = server.create_app()
+    os.environ[reg_server.DEFAULT_CONFIG_VAR] = 'tests/.env'
+    test_app = reg_server.create_app()
 
     with test_app.test_client() as client:
         with test_app.app_context():
