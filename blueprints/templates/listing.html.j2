@@ -9,7 +9,31 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Hi there!</h1>
+    <div class='text'>
+        <h1>Hi there!</h1>
+    </div>
+    <div class='mg-sm'>
+        <a href='/'>All</a>
+
+        {% if is_accepteds %}
+            <a href='/?accepted=false'>Show not accepteds</a>
+        {% else %}
+            <a href='/?accepted=true'>Show accepteds</a>
+        {% endif %}
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class='mg-sm'>
+                <ul>
+                    {% for msg in messages %}
+                        <li class='err'>{{ msg }}</>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endwith %}
+    
     <table>
         <tr>
             <th>ID</th>
@@ -18,12 +42,27 @@
             <th>Status</th>
         </tr>
 
-        {% for rqst in requests %}
+        {% for req in requests %}
             <tr>
-                <td>{{ rqst.id }}</td>
-                <td>{{ rqst.email }}</td>
-                <td>{{ rqst.created_at }}</td>
-                <td>{{ 'accepted' if rqst.accepted else 'denied' }}</td>
+                <td>{{ req.id }}</td>
+                <td>{{ req.email }}</td>
+                <td>{{ req.created_at }}</td>
+                <td>
+                    {% if req.accepted %}
+                        accepted
+                    {% else %}
+                        waiting {{ min_votes - req.votes_count }} vote(s)
+                    {% endif %}
+                </td>
+                {% if not is_accepteds %} 
+                    <td>
+                        {% if not req.accepted %}
+                            <form action={{ url_for('control.accept_request', req_id=req.id) }} method='post'>
+                                <input type='submit' value='Vote'>
+                            </form>
+                        {% endif %}
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table> 

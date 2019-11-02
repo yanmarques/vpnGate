@@ -1,26 +1,24 @@
 {% extends 'layout.html.j2' %}
 
 {% block body %}
-    <div id='container'>
-        <div class='text'>
-            <h1>Welcome to vpnGate</h1>
+    <div class='text'>
+        <h1>Welcome to vpnGate</h1>
 
-            <p>
-                Here you can find an IPsec based vpn. If you want access, make a request.
-            </p>
-        
-            <form method='post' action={{ url_for('requests.register') }}>
-                {{ form.csrf_token }}
+        <p>
+            Here you can find an IPsec based vpn. If you want access, make a request.
+        </p>
+    
+        <form method='post' action={{ url_for('requests.register') }}>
+            {{ form.csrf_token }}
 
-                {{ form.email.label }}
-                {{ form.email }}
-                
-                <input type='submit' value='Send'>
-                <br>
-                {% for message in form.email.errors %}
-                    <span class='err'>{{ message }}<span>
-                {% endfor %}
-            </form>
-        </div>
+            {{ form.email.label }}
+            {{ form.email }}
+            
+            <input type='submit' value='Send'>
+            <br>
+            {% for message in form.email.errors %}
+                <span class='err'>{{ message }}<span>
+            {% endfor %}
+        </form>
     </div>
 {% endblock %}

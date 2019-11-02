@@ -6,14 +6,17 @@ from sys_util import run_shell
 
 
 @pytest.fixture
-def client():
+def reg_client():
     # update running environment to load custom file
     os.environ[reg_server.DEFAULT_CONFIG_VAR] = 'tests/.env'
+    os.environ['FLASK_APP'] = 'reg_server:create_app()'
     test_app = reg_server.create_app()
 
     with test_app.test_client() as client:
         with test_app.app_context():
-            run_shell('flask gen:database')
+            process = run_shell('flask gen:database')
+            test_app.logger.debug(process.stdout)
+            test_app.logger.error(process.stderr)
             yield client
 
             # remove test database
