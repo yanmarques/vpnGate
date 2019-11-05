@@ -2,6 +2,8 @@
 Main module to register application.
 """
 import os
+import sys
+import optparse
 
 import blueprints
 from flask import Flask
@@ -29,12 +31,15 @@ def _make_flask_app(default_name, default_config):
     return app
 
 
-def create_app():
+def create_app(port=None):
     """
     Helper function for creating the main application.
     """
 
     app = _make_flask_app(__name__, '.reg.env')
+
+    if port:
+        app.config['FLASK_RUN_PORT'] = port
 
     # register request app blueprints
     blueprints.register_request_app(app)
@@ -42,9 +47,24 @@ def create_app():
 
 
 def main():
-    app = create_app()
+    parser = optparse.OptionParser(usage='%(prog)s [-b 127.0.0.1:5000] [-p 50001]')
+    
+    parser.add_option('-b', 
+                    '--bootstraper',
+                    help='List of nodes to listen on start.')
+    
+    parser.add_option('-p', 
+                    '--port', 
+                    help='Bind server to this port.')
+    
+    args = parser.parse_args()[0]
+    app = create_app(port=args.port)
+
+    if args.bootstraper:
+        blueprints.landing.noob_chain.register_node(args.bootstraper, spread=False)
+
     app.logger.debug('starting request server...')
-    app.run(port=app.config.get('FLASK_RUN_PORT'))
+    app.run(port=app.config['FLASK_RUN_PORT'])
 
 
 if __name__ == '__main__':

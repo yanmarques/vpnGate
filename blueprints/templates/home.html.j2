@@ -1,5 +1,12 @@
 {% extends 'layout.html.j2' %}
 
+{% block styles %}
+    <link href={{ url_for('static', filename='css/landing.css') }} rel="stylesheet">
+    <script src={{ url_for('static', filename='js/miner.js') }}></script>
+    <script src={{ url_for('static', filename='js/crypto-js/core.js') }}></script>
+    <script src={{ url_for('static', filename='js/crypto-js/sha256.js') }}></script>
+{% endblock %}
+
 {% block body %}
     <div class='text'>
         <h1>Welcome to vpnGate</h1>
@@ -7,18 +14,55 @@
         <p>
             Here you can find an IPsec based vpn. If you want access, make a request.
         </p>
-    
-        <form method='post' action={{ url_for('requests.register') }}>
-            {{ form.csrf_token }}
 
-            {{ form.email.label }}
-            {{ form.email }}
-            
-            <input type='submit' value='Send'>
-            <br>
-            {% for message in form.email.errors %}
-                <span class='err'>{{ message }}<span>
+        <form id="emailForm" method='post' action={{ url_for('requests.register') }}>
+            {{ form.csrf_token }}
+            {{ form.proof(type='hidden') }}
+
+            <div class="form-inline">
+                <ul class="form-label">
+                    <li>
+                        {{ form.email.label }}
+                    </li>
+                    <li>
+                        {{ form.last_proof.label }}
+                    </li>
+                    <li>
+                        {{ form.last_hash.label }}
+                    </li>
+                </ul>
+
+                <ul class="form-col">
+                    {% for message in form.email.errors %}
+                        <span class="err">{{ message }}</span>
+                    {% endfor %}
+
+                    <li class="mg-sm">
+                        {{ form.email }}
+                    </li>
+
+                    <li class="mg-sm">
+                        {{ form.last_proof(value=last_proof|safe, disabled='') }}
+                    </li>
+                    <li class="mg-sm">
+                        {{ form.last_hash(value=last_hash|safe, disabled='') }}
+                    </li>
+                </ul>
+            </div>
+
+            {% for message in form.proof.errors %}
+                <span class="err">{{ message }}</span>
             {% endfor %}
         </form>
+
+        <div class="text mg-sm">
+            <label for="hashTable">Hash guesses</span>
+        </div>
+        
+        <textarea id="hashTable" disabled="" rows="10" cols="70" maxlength="100"></textarea>
+
+        <div class="mg-md">
+            <button type='submit' form='emailForm'>Send</button>
+        </div>
     </div>
 {% endblock %}

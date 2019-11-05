@@ -1,7 +1,7 @@
 import sqlite3
 
 from flask import Blueprint, render_template, current_app, redirect, request, flash
-from .models import Request, VoteRequest
+from lib.models import Request, VoteRequest
 
 
 web = Blueprint('control', __name__, template_folder='templates')

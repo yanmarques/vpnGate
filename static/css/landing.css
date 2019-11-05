@@ -1,0 +1,19 @@
+#emailForm ul {
+    list-style: none;
+}
+
+#emailForm input {
+    width: 100%;
+}
+
+.form-inline ul {
+    display: inline-block;
+}
+
+.form-label li {
+    margin: 23px -15px;
+}
+
+.form-col {
+    width: 55%;
+}
