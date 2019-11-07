@@ -2,10 +2,14 @@ import hashlib
 import json
 from time import time
 from urllib.parse import urlparse
+from traceback import print_tb
 
 import requests
 from flask import url_for
 
+
+# Maximum time for http connection
+DEFAULT_TIMEOUT = 3.5
 
 DEFAULT_CONFIG = {
     'difficulty': 4, 
@@ -20,26 +24,36 @@ def send_to_nodes(target, node_list, method='post'):
     assert caller is not None, 'Invalid method'
     for node in node_list:
         try:
-            response = caller(f'{node}/node', data=payload)
+            response = caller(f'{node}/node', 
+                            data=payload,
+                            timeout=DEFAULT_TIMEOUT)
+
             if response.status_code != 201:
                 print(response.text)
         except Exception as exc:
-            print(str(exc))
+            print_exception(exc)
 
 
 def get_json(url):
-    response = requests.get(url)
-    print(f'received response for {url}: {response}')
-    if response.status_code == 200:
-        return response.json()
+    response = http_get(url)
+    if response is not None:
+        print(f'received response for {url}: {response}')
+        if response.status_code == 200:
+            return response.json()
 
 
 def hash_http_response(url, default=''):
-    try:
-        response = requests.get(url)
+    response = http_get(url, default=default)
+    if response != default:
         return hashlib.sha256(response.content).hexdigest()
-    except requests.exceptions.ConnectionError as exc:
-        print(str(exc))
+    return default
+
+
+def http_get(url, default=None):
+    try:
+        return requests.get(url, timeout=DEFAULT_TIMEOUT)
+    except Exception as exc:
+        print_exception(exc)
     return default
 
 
@@ -58,6 +72,11 @@ def parse_host(address):
         return f'http://{parsed_url.path}'
     
     raise ValueError('Invalid URL')
+
+
+def print_exception(exception):
+    print_tb(exception.__traceback__)
+    print(str(exception))
 
 
 class Blockchain:
