@@ -65,7 +65,8 @@ def main():
         blockchain.register_node(args.bootstraper, spread=False)
 
     app.logger.debug('starting request server...')
-    app.run(port=app.config['FLASK_RUN_PORT'])
+    app.run(port=app.config['FLASK_RUN_PORT'],
+            host=app.config['FLASK_RUN_HOST'])
 
 
 if __name__ == '__main__':
