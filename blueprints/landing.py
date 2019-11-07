@@ -58,6 +58,7 @@ def has_node_address():
     """
 
     address = urlparse(request.remote_addr).path
+    current_app.logger.debug('incoming address: %s', address)
     for node in list(web.blocks.nodes):
         if urlparse(node).netloc.split(':', 1)[0] == address:
             current_app.logger.debug('node address found: %s', address)
@@ -104,14 +105,14 @@ def index(form=None):
 
 @web.route('/register', methods=['post'])
 def register():
-    web.blocks.spread_neighbors()
-    web.blocks.exchange_chains()
-    web.blocks.validate_neighbors()
-
     logger = current_app.logger
     form = RequestForm()
     
     if form.validate():
+        web.blocks.spread_neighbors()
+        web.blocks.exchange_chains()
+        web.blocks.validate_neighbors()
+
         last_proof, last_hash = get_last_info()
         email = form.data['email']
         proof = form.data['proof']
@@ -127,7 +128,7 @@ def register():
         else:
             form.proof.errors.append('Invalid proof of work!') 
             form.proof.errors.append('Maybe someone have mined faster than you. Try it again.')            
-    current_app.logger.debug('errors: %s', form.errors)
+    logger.debug('errors: %s', form.errors)
     return index(form=form)
 
 
