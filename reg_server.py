@@ -47,7 +47,7 @@ def create_app(port=None):
 
 
 def main():
-    parser = optparse.OptionParser(usage='%(prog)s [-b 127.0.0.1:5000] [-p 50001]')
+    parser = optparse.OptionParser(usage='%(prog)s [-b 127.0.0.1:5001] [-p 5000]')
     
     parser.add_option('-b', 
                     '--bootstraper',
@@ -61,7 +61,8 @@ def main():
     app = create_app(port=args.port)
 
     if args.bootstraper:
-        blueprints.landing.noob_chain.register_node(args.bootstraper, spread=False)
+        blockchain = blueprints.landing.web.blocks
+        blockchain.register_node(args.bootstraper, spread=False)
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'])

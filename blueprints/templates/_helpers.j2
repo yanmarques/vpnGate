@@ -1,0 +1,9 @@
+{% macro show_errors(errors) %}
+    {% if errors %}
+        <ul>
+            {% for message in errors %}
+                <li class="err">{{ message }}</span>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}

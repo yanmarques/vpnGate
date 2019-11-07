@@ -16,8 +16,12 @@
         </p>
 
         <form id="emailForm" method='post' action={{ url_for('requests.register') }}>
-            {{ form.csrf_token }}
+            {% if with_token %}
+                {{ form.csrf_token }}
+            {% endif %}
             {{ form.proof(type='hidden') }}
+
+            {% from '_helpers.j2' import show_errors %}
 
             <div class="form-inline">
                 <ul class="form-label">
@@ -33,9 +37,7 @@
                 </ul>
 
                 <ul class="form-col">
-                    {% for message in form.email.errors %}
-                        <span class="err">{{ message }}</span>
-                    {% endfor %}
+                    {{ show_errors(form.email.errors) }}
 
                     <li class="mg-sm">
                         {{ form.email }}
@@ -48,11 +50,9 @@
                         {{ form.last_hash(value=last_hash|safe, disabled='') }}
                     </li>
                 </ul>
-            </div>
 
-            {% for message in form.proof.errors %}
-                <span class="err">{{ message }}</span>
-            {% endfor %}
+                {{ show_errors(form.proof.errors) }}
+            </div>
         </form>
 
         <div class="text mg-sm">
