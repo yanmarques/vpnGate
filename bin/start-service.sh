@@ -12,7 +12,10 @@ ENV_FILE="$2"
 shift
 shift
 
-cp .env.example "$ENV_FILE"
+if [ ! -f "$ENV_FILE" ]; then
+    cp .env.example "$ENV_FILE"
+fi 
+
 dotenv -f "$ENV_FILE" -q never set FLASK_DEBUG 0 
 dotenv -f "$ENV_FILE" set FLASK_ENV production
 dotenv -f "$ENV_FILE" set FLASK_RUN_HOST 0.0.0.0
