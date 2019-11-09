@@ -15,7 +15,8 @@ shift
 cp .env.example "$ENV_FILE"
 dotenv -f "$ENV_FILE" -q never set FLASK_DEBUG 0 
 dotenv -f "$ENV_FILE" set FLASK_ENV production
+dotenv -f "$ENV_FILE" set FLASK_RUN_HOST 0.0.0.0
 
 export FLASK_APP="$APP_NAME:create_app()"
 flask gen:key "$ENV_FILE"
-python "$APP_NAME.py" "$@"
+gunicorn "$FLASK_APP"
