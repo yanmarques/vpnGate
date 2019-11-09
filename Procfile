@@ -1,0 +1,1 @@
+web: ./bin/start-service.sh reg_server .reg.env
