@@ -2,6 +2,7 @@
 This module provides commands to run with flask binary.
 """
 import click
+import dotenv
 
 
 def register(app):
@@ -18,8 +19,11 @@ def register(app):
         # generate pseudo-random key
         secret_key = b64encode(token_bytes(byte_size)).decode()
 
-        command = f"sed -i 's|.*SECRET_KEY=.*|SECRET_KEY=\"{secret_key}\"|'"
-        command += f' {dest_file}'
+        command = dotenv.get_cli_string(path=dest_file,
+                                        action='set',
+                                        key='SECRET_KEY',
+                                        value=secret_key)
+
         run_shell(command)
 
         click.echo(f"[*] Key generated and saved at '{dest_file}'")
