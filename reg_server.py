@@ -28,10 +28,11 @@ def _make_flask_app(default_name, default_config):
     # flask main object
     app = Flask(os.environ.get('APP_NAME', default_name))
     app.config.from_pyfile(config_file)
+    
     return app
 
 
-def create_app(port=None, host=None, server=None):
+def create_app(port=None, host=None, server=None, bootstraper=None):
     """
     Helper function for creating the main application.
     """
@@ -46,6 +47,9 @@ def create_app(port=None, host=None, server=None):
 
     if server:
         app.config['SERVER_NAME'] = server
+
+    if bootstraper:
+        app.config['CHAIN_BOOTSTRAPER'] = bootstraper
 
     # register request app blueprints
     blueprints.register_request_app(app)
@@ -74,10 +78,8 @@ def main():
     args = parser.parse_args()[0]
     app = create_app(port=args.port, 
                     host=args.address,
-                    server=args.server)
-
-    if args.bootstraper:
-        app.blocks.register_node(args.bootstraper)
+                    server=args.server,
+                    boostraper=args.bootstraper)
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'],

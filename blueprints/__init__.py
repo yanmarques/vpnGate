@@ -1,3 +1,5 @@
+import os
+
 from . import landing, panel, database, cli
 from lib.blockchain import Blockchain
 
@@ -6,7 +8,12 @@ def register_request_app(app):
     _register_all(app, [landing.web])
     name = who_am_i(app)
     config = parse_blockchain_config(app)
+
     blocks = Blockchain(name, config=config)
+    bootstraper = get_config_or_environ(app, 'CHAIN_BOOTSTRAPER')
+    if bootstraper:
+        blocks.register_node(bootstraper)
+    
     setattr(app, 'blocks', blocks)
     print(f'running on: {name}')
 
@@ -34,7 +41,11 @@ def parse_blockchain_config(app):
 
 def who_am_i(app):
     pre_built_name = f'{app.config["FLASK_RUN_HOST"]}:{app.config["FLASK_RUN_PORT"]}'
-    return app.config.get('SERVER_NAME') or pre_built_name
+    return get_config_or_environ(app, 'SERVER_NAME', default=pre_built_name)
+
+
+def get_config_or_environ(app, key, default=None):
+    return (app.config.get(key) or os.getenv(key)) or default
 
 
 def _register_all(app, blueprints, with_extra=True):
