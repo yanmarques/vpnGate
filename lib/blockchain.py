@@ -9,7 +9,7 @@ from flask import url_for
 
 
 # Maximum time for http connection
-DEFAULT_TIMEOUT = 3.5
+DEFAULT_TIMEOUT = 10
 
 DEFAULT_CONFIG = {
     'difficulty': 4, 

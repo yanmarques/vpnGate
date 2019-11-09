@@ -1,5 +1,5 @@
-const dificulty = 1;
-const timeout = 5;
+const dificulty = 2;
+const timeout = 10;
 
 window.onload = function (event) {
     const form = document.getElementById('emailForm');
