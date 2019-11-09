@@ -56,6 +56,10 @@ def main():
     parser.add_option('-p', 
                     '--port', 
                     help='Bind server to this port.')
+                
+    parser.add_option('-a', 
+                    '--address', 
+                    help='Bind server to this address.')
     
     args = parser.parse_args()[0]
     app = create_app(port=args.port)
@@ -65,7 +69,7 @@ def main():
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'],
-            host=app.config['FLASK_RUN_HOST'])
+            host=args.address)
 
 
 if __name__ == '__main__':
