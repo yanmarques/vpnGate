@@ -62,7 +62,7 @@ def main():
 
     if args.bootstraper:
         blockchain = blueprints.landing.web.blocks
-        blockchain.register_node(args.bootstraper, spread=False)
+        blockchain.register_node(args.bootstraper)
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'],
