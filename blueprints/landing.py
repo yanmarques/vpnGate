@@ -1,6 +1,8 @@
 import sqlite3
 from urllib.parse import urlparse
 from functools import wraps
+import socket
+import ipaddress
 
 from flask import Blueprint, render_template, current_app, request
 from flask_wtf import FlaskForm
@@ -59,10 +61,21 @@ def has_node_address():
 
     address = urlparse(request.remote_addr).path
     current_app.logger.debug('incoming address: %s', address)
+    
     for node in list(current_app.blocks.nodes):
-        if urlparse(node).netloc.split(':', 1)[0] == address:
-            current_app.logger.debug('node address found: %s', address)
-            return True
+        node_address = urlparse(node).netloc.split(':', 1)[0] 
+        try:
+            ipaddress.IPv4Address(node_address)
+            # is an ip address, direct checking
+            if node_address == address:
+                current_app.logger.debug('node address found: %s', address)
+                return True
+        except ipaddress.AddressValueError:
+            # it's a hostname, resolve to IP and check 
+            node_addr_resolution = socket.gethostbyname_ex(node_address)[2]
+            if address in node_addr_resolution:
+                current_app.logger.debug('node address found: %s', address)
+                return True
     return False
 
 
