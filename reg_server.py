@@ -31,7 +31,7 @@ def _make_flask_app(default_name, default_config):
     return app
 
 
-def create_app(port=None):
+def create_app(port=None, host=None, server=None):
     """
     Helper function for creating the main application.
     """
@@ -40,6 +40,12 @@ def create_app(port=None):
 
     if port:
         app.config['FLASK_RUN_PORT'] = port
+
+    if host:
+        app.config['FLASK_RUN_HOST'] = host
+
+    if server:
+        app.config['SERVER_NAME'] = server
 
     # register request app blueprints
     blueprints.register_request_app(app)
@@ -60,16 +66,22 @@ def main():
     parser.add_option('-a', 
                     '--address', 
                     help='Bind server to this address.')
+
+    parser.add_option('-s', 
+                    '--server',
+                    help='Server name to advertise.')
     
     args = parser.parse_args()[0]
-    app = create_app(port=args.port)
+    app = create_app(port=args.port, 
+                    host=args.address,
+                    server=args.server)
 
     if args.bootstraper:
         app.blocks.register_node(args.bootstraper)
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'],
-            host=args.address)
+            host=app.config['FLASK_RUN_HOST'])
 
 
 if __name__ == '__main__':

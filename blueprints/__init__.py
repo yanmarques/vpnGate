@@ -33,7 +33,8 @@ def parse_blockchain_config(app):
 
 
 def who_am_i(app):
-    return f'{app.config["FLASK_RUN_HOST"]}:{app.config["FLASK_RUN_PORT"]}'
+    pre_built_name = f'{app.config["FLASK_RUN_HOST"]}:{app.config["FLASK_RUN_PORT"]}'
+    return app.config.get('SERVER_NAME') or pre_built_name
 
 
 def _register_all(app, blueprints, with_extra=True):
