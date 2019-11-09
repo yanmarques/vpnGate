@@ -18,5 +18,6 @@ dotenv -f "$ENV_FILE" set FLASK_ENV production
 dotenv -f "$ENV_FILE" set FLASK_RUN_HOST 0.0.0.0
 
 export FLASK_APP="$APP_NAME:create_app()"
+
 flask gen:key "$ENV_FILE"
-gunicorn wsgi:app
+APP_WSGI="$APP_NAME" gunicorn wsgi:app
