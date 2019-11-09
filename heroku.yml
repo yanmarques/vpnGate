@@ -1,0 +1,2 @@
+run:
+  web: ./bin/start-service.sh reg_server .reg.env -p $PORT -a 0.0.0.0 -s https://vpngate1.herokuapp.com
