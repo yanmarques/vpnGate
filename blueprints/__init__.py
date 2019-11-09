@@ -7,7 +7,7 @@ def register_request_app(app):
     name = who_am_i(app)
     config = parse_blockchain_config(app)
     blocks = Blockchain(name, config=config)
-    setattr(landing.web, 'blocks', blocks)
+    setattr(app, 'blocks', blocks)
     print(f'running on: {name}')
 
 
@@ -16,7 +16,7 @@ def register_panel_app(app):
 
 
 def parse_blockchain_config(app):
-    config = dict()
+    config = dict() 
 
     difficulty = app.config.get('CHAIN_DIFFICULTY')
     if difficulty:

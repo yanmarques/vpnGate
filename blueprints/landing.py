@@ -31,8 +31,8 @@ def get_last_info():
     :return: Proof of work and the hash
     """
 
-    last_block = web.blocks.last_block
-    return last_block['proof'], web.blocks.hash(last_block)
+    last_block = current_app.blocks.last_block
+    return last_block['proof'], current_app.blocks.hash(last_block)
 
 
 def valid_email(email):
@@ -43,7 +43,7 @@ def valid_email(email):
     :return: <bool>
     """
 
-    for block in web.blocks.chain:
+    for block in current_app.blocks.chain:
         if email in block['transactions']:
             return False
     return True
@@ -59,7 +59,7 @@ def has_node_address():
 
     address = urlparse(request.remote_addr).path
     current_app.logger.debug('incoming address: %s', address)
-    for node in list(web.blocks.nodes):
+    for node in list(current_app.blocks.nodes):
         if urlparse(node).netloc.split(':', 1)[0] == address:
             current_app.logger.debug('node address found: %s', address)
             return True
@@ -87,9 +87,9 @@ def index(form=None):
     
     print(f'token: {with_token}')
     if with_token:
-        web.blocks.resolve_conflicts()
+        current_app.blocks.resolve_conflicts()
     else:
-        web.blocks.exchange_chains()
+        current_app.blocks.exchange_chains()
 
     if form is None:
         form = RequestForm()
@@ -109,19 +109,19 @@ def register():
     form = RequestForm()
     
     if form.validate():
-        web.blocks.spread_neighbors()
-        web.blocks.exchange_chains()
-        web.blocks.validate_neighbors()
+        current_app.blocks.spread_neighbors()
+        current_app.blocks.exchange_chains()
+        current_app.blocks.validate_neighbors()
 
         last_proof, last_hash = get_last_info()
         email = form.data['email']
         proof = form.data['proof']
 
-        if web.blocks.valid_proof(last_proof, proof, last_hash):
+        if current_app.blocks.valid_proof(last_proof, proof, last_hash):
             if valid_email(email):
-                web.blocks.new_transaction(email)
-                web.blocks.new_block(proof, last_hash)
-                replaced = web.blocks.exchange_chains()
+                current_app.blocks.new_transaction(email)
+                current_app.blocks.new_block(proof, last_hash)
+                replaced = current_app.blocks.exchange_chains()
                 logger.debug('chain was replaced: %s', replaced)
                 return render_template('success.html.j2')
             form.email.errors.append(f"This email '{email}' was already been registered.")            
@@ -136,8 +136,8 @@ def register():
 @only_node_personal
 def chain():
     response = {
-        'chain': web.blocks.chain,
-        'length': len(web.blocks.chain)
+        'chain': current_app.blocks.chain,
+        'length': len(current_app.blocks.chain)
     }
     
     return response, 200
@@ -149,25 +149,24 @@ def node_action():
     logger = current_app.logger
     if request.method == 'GET':
         response = {
-            'nodes': list(web.blocks.nodes),
-            'revokeds': list(web.blocks.revokeds)
+            'nodes': list(current_app.blocks.nodes),
+            'revokeds': list(current_app.blocks.revokeds)
         }
 
         return response
 
-    values = request.form
-    if 'nodes' in values and values['nodes']:
-        content = values['nodes']
-        if not type(content) is list:
-            content = [content]
+    if 'nodes' in request.form:
+        nodes = request.form.getlist('nodes')
+        logger.debug('nodes size: %s', len(nodes))
+                
+        if nodes:
+            if request.method == 'POST':
+                function = current_app.blocks.register_node
+            else:
+                function = current_app.blocks.revoke_node
 
-        if request.method == 'POST':
-            function = web.blocks.register_node
-        else:
-            function = web.blocks.revoke_node
-
-        list(map(function, content))
-        return '', 201
+            list(map(function, nodes))
+            return '', 201
 
     response = {
         'nodes': 'Value is missing.'
