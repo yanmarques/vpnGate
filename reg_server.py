@@ -46,7 +46,7 @@ def create_app(port=None, host=None, server=None, bootstraper=None):
         app.config['FLASK_RUN_HOST'] = host
 
     if server:
-        app.config['SERVER_NAME'] = server
+        app.config['CHAIN_SERVER_NAME'] = server
 
     if bootstraper:
         app.config['CHAIN_BOOTSTRAPER'] = bootstraper

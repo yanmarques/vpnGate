@@ -41,7 +41,7 @@ def parse_blockchain_config(app):
 
 def who_am_i(app):
     pre_built_name = f'{app.config["FLASK_RUN_HOST"]}:{app.config["FLASK_RUN_PORT"]}'
-    return get_config_or_environ(app, 'SERVER_NAME', default=pre_built_name)
+    return get_config_or_environ(app, 'CHAIN_SERVER_NAME', default=pre_built_name)
 
 
 def get_config_or_environ(app, key, default=None):
