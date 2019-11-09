@@ -129,7 +129,8 @@ class Blockchain:
         """
 
         status = False
-        if node in self.nodes and not self.predicate.is_valid(node):
+        if (node in self.nodes or node in self.revokeds) and \
+                        not self.predicate.is_valid(node):
             print(f'node revoked: {node}')
             self.nodes.remove(node)
             self.revokeds.append(node)
@@ -319,11 +320,11 @@ class Blockchain:
         for node in list(self.nodes):
             data = get_json(f'{node}/node')
             if not data:
-                self.revokeds.append(node)
                 continue
 
             self.revokeds.extend(data['revokeds'])
             new_neighbours = set(data['nodes'])
+            print(new_neighbours)
             diff = list(new_neighbours - self.nodes)
     
             print('starting spread...')        
@@ -343,9 +344,11 @@ class Blockchain:
                         print(f'sending local name: {node}')
                         send_to_nodes([self.server_name], [node])
 
-        min_votes = round(len(self.nodes) / 2)
+        min_votes = round((len(self.nodes) + 1 ) / 2)
         for node in set(self.revokeds):
+            print(f'revokeds count: {self.revokeds.count(node)}')
             if self.revokeds.count(node) < min_votes:
+                print(f'node was re-inserted: {node}')
                 self.nodes.add(node)
             else:
                 print(f'node was removed: {node}')
