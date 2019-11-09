@@ -19,4 +19,4 @@ dotenv -f "$ENV_FILE" set FLASK_RUN_HOST 0.0.0.0
 
 export FLASK_APP="$APP_NAME:create_app()"
 flask gen:key "$ENV_FILE"
-gunicorn "$FLASK_APP"
+gunicorn wsgi:app
