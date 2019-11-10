@@ -1,0 +1,18 @@
+{% extends 'layout.html.j2' %}
+
+{% block body %}
+    <div class='text'>
+        <h1>Friend Mirrors</h1>
+
+        <ul>
+            {% for url in nodes %}
+                <li>
+                    <a href={{ url }} target="_blank">{{ url }}</a>
+                </li>
+            {% else %}
+                <p>Any mirror available.</a>
+            {% endfor %}
+        </ul>
+
+    </div>
+{% endblock %}

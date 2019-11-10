@@ -15,6 +15,10 @@
             Here you can find an IPsec based vpn. If you want access, make a request.
         </p>
 
+        <p>
+            <a href={{ url_for('requests.mirrors') }}>Show mirrors</a>
+        </p>
+
         <form id="emailForm" method='post' action={{ url_for('requests.register') }}>
             {% if with_token %}
                 {{ form.csrf_token }}
