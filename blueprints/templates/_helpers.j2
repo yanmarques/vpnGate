@@ -2,7 +2,7 @@
     {% if errors %}
         <ul>
             {% for message in errors %}
-                <li class="err">{{ message }}</span>
+                <li class="err">{{ message|safe }}</span>
             {% endfor %}
         </ul>
     {% endif %}
