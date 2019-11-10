@@ -79,7 +79,7 @@ def main():
     app = create_app(port=args.port, 
                     host=args.address,
                     server=args.server,
-                    boostraper=args.bootstraper)
+                    bootstraper=args.bootstraper)
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'],
