@@ -1,0 +1,33 @@
+{
+    "node": {
+        "host": "http://1.2.3.4",
+        "parent": null,
+        "identifier": "5aef7994-9db3-4ce1-ad35-c6418bb2d753",
+        "children": [],
+        "siblings": [],
+        "is_secure": false
+    },
+    "name": "node",
+    "config": {
+        "difficulty": 1,
+        "validation_time": 30,
+        "spreading_time": 60,
+        "token_pending_time": 120,
+        "token_renew_time": 7200
+    },
+    "tokens": [],
+    "pending_tokens": [],
+    "transactions": [],
+    "chain": [
+        {
+            "index": 1,
+            "timestamp": 1,
+            "transactions": [],
+            "proof": 100,
+            "previous_hash": "1"
+        }
+    ],
+    "revokeds": [],
+    "bootstraped": true,
+    "boot_storage_path": "tests/myboot.json"
+}

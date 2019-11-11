@@ -32,12 +32,12 @@ def _make_flask_app(default_name, default_config):
     return app
 
 
-def create_app(port=None, host=None, server=None, bootstraper=None):
+def create_app(env=None, port=None, host=None, server=None, bootstrap=None):
     """
     Helper function for creating the main application.
     """
 
-    app = _make_flask_app(__name__, '.reg.env')
+    app = _make_flask_app(__name__, env or os.getenv('APP_ENV') or '.reg.env')
 
     if port:
         app.config['FLASK_RUN_PORT'] = port
@@ -46,10 +46,10 @@ def create_app(port=None, host=None, server=None, bootstraper=None):
         app.config['FLASK_RUN_HOST'] = host
 
     if server:
-        app.config['CHAIN_SERVER_NAME'] = server
+        app.config['NODE_HOST'] = server
 
-    if bootstraper:
-        app.config['CHAIN_BOOTSTRAPER'] = bootstraper
+    if bootstrap:
+        app.config['BOOTSTRAP_STORAGE_PATH'] = bootstrap
 
     # register request app blueprints
     blueprints.register_request_app(app)
@@ -60,8 +60,8 @@ def main():
     parser = optparse.OptionParser(usage='%(prog)s [-b 127.0.0.1:5001] [-p 5000]')
     
     parser.add_option('-b', 
-                    '--bootstraper',
-                    help='List of nodes to listen on start.')
+                    '--bootstrap',
+                    help='Path of bootstrap file.')
     
     parser.add_option('-p', 
                     '--port', 
@@ -75,11 +75,16 @@ def main():
                     '--server',
                     help='Server name to advertise.')
     
+    parser.add_option('-e', 
+                    '--env',
+                    help='Environment file.')
+    
     args = parser.parse_args()[0]
     app = create_app(port=args.port, 
                     host=args.address,
                     server=args.server,
-                    bootstraper=args.bootstraper)
+                    bootstrap=args.bootstrap,
+                    env=args.env)
 
     app.logger.debug('starting request server...')
     app.run(port=app.config['FLASK_RUN_PORT'],

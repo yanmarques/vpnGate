@@ -1,4 +1,5 @@
 import os
+import secrets
 
 import pytest
 import contextlib
@@ -28,6 +29,8 @@ def reg_get_clients():
     def set_new_address():
         nonlocal first_port
         setup_environ('reg_server:create_app()')
+        os.environ['NODE_CHAIN_STORAGE_PATH'] = f'{secrets.token_hex(3)}.json'
+        os.environ['MAIL_CHAIN_STORAGE_PATH'] = f'{secrets.token_hex(3)}.json'
         test_app = reg_server.create_app(first_port)
         first_port += 1
         return test_app.app_context()
@@ -35,3 +38,10 @@ def reg_get_clients():
     with contextlib.ExitStack() as stack:
         yield [stack.enter_context(set_new_address())
                 for _ in range(3)]
+
+@pytest.fixture
+def temp_file():
+    file = f'{secrets.token_hex(3)}.tmp'
+    yield file
+    os.unlink(file)
+    

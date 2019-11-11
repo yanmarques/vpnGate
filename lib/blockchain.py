@@ -1,10 +1,16 @@
 import hashlib
 import json
+import logging
 from time import time
-from urllib.parse import urlparse
 from traceback import print_tb
+from dataclasses import dataclass, field
+from typing import Any, List, Dict
 
 import requests
+import blueprints
+from .node import Node, ClassStorage, simple_node_factory, filter_node_payload
+from .tokens import JWTRegistry
+from .timers import Scheduler
 from flask import url_for
 
 
@@ -14,7 +20,9 @@ DEFAULT_TIMEOUT = 10
 DEFAULT_CONFIG = {
     'difficulty': 4, 
     'validation_time': 30,
-    'spreading_time': 60
+    'spreading_time': 60,
+    'token_pending_time': 120,
+    'token_renew_time': (60 * 60) * 2 
 }
 
 
@@ -22,9 +30,10 @@ def send_to_nodes(target, node_list, method='post'):
     payload = dict(nodes=target)
     caller = getattr(requests, method)
     assert caller is not None, 'Invalid method'
+    relative_url = url_for('requsts.node') 
     for node in node_list:
         try:
-            response = caller(f'{node}/node', 
+            response = caller(f'{node}{relative_url}', 
                             data=payload,
                             timeout=DEFAULT_TIMEOUT)
 
@@ -61,83 +70,106 @@ def url_wihout_csrf(url):
     return f'{url}?no_token=true'
 
 
-def parse_host(address):
-    parsed_url = urlparse(address.rstrip('/'))
-
-    if parsed_url.netloc:
-        return f'{parsed_url.scheme}://{parsed_url.netloc}'
-    
-    if parsed_url.path:
-        # Accepts an URL without scheme
-        return f'http://{parsed_url.path}'
-    
-    raise ValueError('Invalid URL')
-
-
 def print_exception(exception):
     print_tb(exception.__traceback__)
     print(str(exception))
 
 
+def simple_blockchain_factory(jwt, class_factory, data: dict):
+    data['node'] = simple_node_factory(data['node'])
+    
+    return class_factory(jwt=jwt, **data)
+
+
+def filter_blockchain_payload(payload: dict):
+    payload['node'] = filter_node_payload(payload['node'])
+    del payload['jwt']
+    del payload['schedule']
+    del payload['predicate']
+    return payload
+
+
+@dataclass
+class BlockchainStorage(ClassStorage):
+    output_filter: callable = filter_blockchain_payload
+
+
+@dataclass
 class Blockchain:
     """
     The blockchain where the server will run the transactions.
     """
+    
+    node: Node
+    jwt: JWTRegistry
+    
+    name: str
 
-    def __init__(self, server_name, config: dict=None):
-        self.set_name(server_name)
-        self.current_transactions, self.chain = [], []
-        self.nodes, self.revokeds, self.timers = set(), [], [0, 0]
-        self.predicate = NodePredicate(self)
+    config: Dict = None
+    tokens: List = field(default_factory=list)
+    pending_tokens: List = field(default_factory=list)
+    
+    transactions: List = field(default_factory=list)
+    chain: List = field(default_factory=list)
+    predicate: Any = None
 
-        if config is None:
-            config = DEFAULT_CONFIG
+    revokeds: List = field(default_factory=list)
+    schedule: Scheduler = field(default_factory=Scheduler)
+
+    access_token: str = None
+
+    def __post_init__(self):
+        self.logger = logging.getLogger('blockchain')
+
+        if self.predicate is None:
+            self.predicate = NodePredicate(self)
+
+        if self.config is None:
+            self.config = DEFAULT_CONFIG
         else:
             # merge with default configuration
-            cfg_keys = config.keys()
+            cfg_keys = self.config.keys()
             for key, value in DEFAULT_CONFIG.items():
                 if not key in cfg_keys:
-                    config[key] = value
-            
-        self.config = config
-        print(f'configuration: {config}')
+                    self.config[key] = value
+        
+        self.schedule.configure('validation', self.config['validation_time'])
+        self.schedule.configure('spread', self.config['spreading_time'])
+        self.assign_jwt_issuer()
+
+        self.logger.debug('blockchain config: %s', self.config)
+
         # Create the genesis block
-        self.new_block(previous_hash='1', timestamp=1, proof=100)
+        if not len(self.chain):
+            self.new_block(previous_hash='1', timestamp=1, proof=100)    
 
-    def set_name(self, address):
-        self.server_name = parse_host(address)
+    def request_with_auth(self, url, method='get'):
+        assert self.access_token, 'Any access token available.'
+        kwargs = dict()
+        kwargs['headers'] = {
+            'Authorization': f'Bearer {self.access_token}',
+            'X-Node-Id': self.node.identifier
+        }
+        kwargs['timeout'] = 10
+        return getattr(requests, method)(url, **kwargs)
+    
+    def check_proof_or_fail(self, proof):
+        if not self.valid_proof(proof, *self.get_last_info()):
+            raise RuntimeError('Invalid POW.')
 
-    def register_node(self, address, spread=True):
+    def assign_jwt_issuer(self):
+        self.jwt.issuer = self.node.identifier
+
+    def get_last_info(self):
         """
-        Add a new node to the list of nodes
+        Get the last proof of work and the hash of the last
+        block on the chain.
 
-        :param address: Address of node
+        :return: Proof of work and the hash
         """
 
-        node_url = parse_host(address)
-        print(f'to register: {node_url}')
-        if self.is_remote(node_url):
-            self.nodes.add(node_url)
-
-    def revoke_node(self, node, clear=True):
-        """
-        Remove a node from neighborhood and return wheter was revoked.
-
-        :param node: <str> Address of node
-        :param clear: <bool> Indicates wheter to clear predicate cache
-        :return: <bool> 
-        """
-
-        status = False
-        if (node in self.nodes or node in self.revokeds) and \
-                        not self.predicate.is_valid(node):
-            print(f'node revoked: {node}')
-            self.nodes.remove(node)
-            self.revokeds.append(node)
-            status = True
-        if clear:
-            self.predicate.clear_cache()
-        return status
+        last_block = self.last_block
+        return last_block['proof'], self.hash(last_block)
 
     def valid_chain(self, chain):
         """
@@ -152,15 +184,16 @@ class Blockchain:
 
         while current_index < len(chain):
             block = chain[current_index]
-            print(f'{last_block}')
-            print(f'{block}')
+            self.logger.debug('last block on chain: %s', last_block)
+            self.logger.debug('current block: %s', block)
+
             # Check that the hash of the block is correct
             last_block_hash = self.hash(last_block)
             if block['previous_hash'] != last_block_hash:
                 return False
 
             # Check that the Proof of Work is correct
-            if not self.valid_proof(last_block['proof'], block['proof'], last_block_hash):
+            if not self.valid_proof(block['proof'], last_block['proof'], last_block_hash):
                 return False
 
             last_block = block
@@ -172,7 +205,6 @@ class Blockchain:
         self.validate_neighbors()
         self.spread_neighbors()
         return self.exchange_chains()
-
         
     def exchange_chains(self):
         """
@@ -182,26 +214,35 @@ class Blockchain:
         :return: Wheter current chain was replaced
         """
 
+        if not self.node.is_root:
+            path = url_for('requests.chain', name=self.name)
+
+            # Grab and verify the chains from all the nodes in our network
+            response = self.request_with_auth(f'{self.node.parent.host}{path}')
+            data = response.json()
+            if response.status_code == 200 and data:
+                if self.accept_chain(data['chain']):
+                    return True
+                self.logger.debug('our chain is longer')
+                self.logger.debug('preparing to sync parent')
+        return False
+
+    def accept_chain(self, chain):
+        """
+        Compare the received chain with our chain and replace it
+        when necessary.
+
+        :param chain: A remote chain
+        :return: Wheter our chain was replaced
+        """
+
         # We're only looking for chains longer than ours
         max_length = len(self.chain)
-        new_chain = None
 
-        # Grab and verify the chains from all the nodes in our network
-        for node in list(self.nodes):
-            data = get_json(f'{node}/chain')
-            if data:
-                length, chain = data['length'], data['chain']
-
-                # Check if the length is longer and the chain is valid
-                if length > max_length and self.valid_chain(chain):
-                    max_length = length
-                    new_chain = chain
-
-        # Replace our chain if we discovered a new, valid chain longer than ours
-        if new_chain:
-            self.chain = new_chain
+        # Check if the length is longer and the chain is valid
+        if len(chain) > max_length and self.valid_chain(chain):
+            self.chain = chain
             return True
-
         return False
 
     def new_block(self, proof, previous_hash, timestamp=None):
@@ -216,13 +257,13 @@ class Blockchain:
         block = {
             'index': len(self.chain) + 1,
             'timestamp': timestamp or time(),
-            'transactions': self.current_transactions,
+            'transactions': self.transactions,
             'proof': proof,
-            'previous_hash': previous_hash or self.hash(self.chain[-1]),
+            'previous_hash': previous_hash or self.get_last_info()[1],
         }
 
-        # Reset the current list of transactions
-        self.current_transactions = []
+        # Reset the current transactions
+        self.transactions = []
 
         self.chain.append(block)
         return block
@@ -235,7 +276,7 @@ class Blockchain:
         :return: The index of the Block that will hold this transaction
         """
         
-        self.current_transactions.append(content)
+        self.transactions.append(content)
         return self.last_block['index'] + 1
 
     @property
@@ -260,7 +301,7 @@ class Blockchain:
         block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
-    def proof_of_work(self, last_block):
+    def proof_of_work(self, last_block=None):
         """
         Simple Proof of Work Algorithm:
 
@@ -271,16 +312,18 @@ class Blockchain:
         :return: A valid proof of work
         """
 
+
+        last_block = last_block or self.last_block
         last_proof = last_block['proof']
         last_hash = self.hash(last_block)
 
         proof = 0
-        while self.valid_proof(last_proof, proof, last_hash) is False:
+        while self.valid_proof(proof, last_proof, last_hash) is False:
             proof += 1
 
         return proof
 
-    def valid_proof(self, last_proof, proof, last_hash):
+    def valid_proof(self, proof, last_proof, last_hash):
         """
         Validates the Proof
 
@@ -296,7 +339,7 @@ class Blockchain:
 
         return guess_hash[-difficulty:] == "0" * difficulty
 
-    def is_remote(self, node):
+    def is_remote(self, node: Node):
         """
         Defines wheter the given node is not the current server.
 
@@ -304,87 +347,15 @@ class Blockchain:
         :return: <bool>
         """
         
-        return not node.endswith(self.server_name)
+        return self.node.identifier != node.identifier
 
     def spread_neighbors(self):
-        """
-        Share node information with all registered nodes from this chain
-        and the remote chain.
+        if self.schedule.check('spread'):
+            self._do_spread()
 
-        :param node: <str> Current node
-        """
-
-        if self.check_timer(0, 'spreading_time') is False:
-            return
-
-        for node in list(self.nodes):
-            data = get_json(f'{node}/node')
-            if not data:
-                continue
-
-            self.revokeds.extend(data['revokeds'])
-            new_neighbours = set(data['nodes'])
-            print(new_neighbours)
-            diff = list(new_neighbours - self.nodes)
-    
-            print('starting spread...')        
-            if diff:
-                print(f'has differences: {diff}')
-                remote_needs_local = not self._has_own_server(new_neighbours) 
-
-                if len(self.nodes) > len(new_neighbours):
-                    if remote_needs_local:
-                        diff.add(self.server_name)
-                    print('sending current configuration to this node')
-                    send_to_nodes(diff, [node])
-                else:
-                    print('registering the difference with us')
-                    list(map(self.register_node, diff))
-                    if remote_needs_local:
-                        print(f'sending local name: {node}')
-                        send_to_nodes([self.server_name], [node])
-
-        min_votes = round((len(self.nodes) + 1 ) / 2)
-        for node in set(self.revokeds):
-            print(f'revokeds count: {self.revokeds.count(node)}')
-            if self.revokeds.count(node) < min_votes:
-                print(f'node was re-inserted: {node}')
-                self.nodes.add(node)
-            else:
-                print(f'node was removed: {node}')
-        self.revokeds = []
-    
     def validate_neighbors(self):
-        """
-        Compute a hash function with each node endpoint that
-        matches the own server endpoint.
-        """
-
-        if self.check_timer(1, 'validation_time') is False:
-            return
-
-        invalids = []
-        
-        for node in list(self.nodes):
-            # try to revoke without clearing predicate's cache
-            if self.revoke_node(node, clear=False):
-                invalids.append(node)
-        
-        # clear predicate's cache
-        self.predicate.clear_cache()
-
-        if invalids:
-            print(f'nodes invalid: {invalids}')
-            send_to_nodes(invalids, self.nodes, method='delete')
-
-    def check_timer(self, index, max_time):
-        if index < len(self.timers) and \
-                    (time() - self.timers[index]) <= self.config[max_time]:
-            return False
-
-        # initialize timer
-        self.timers[index] = time()
-        return True
+        if self.schedule.check('validation'):
+            self._do_validation()
 
     def _has_own_server(self, nodes):
         """
@@ -399,6 +370,60 @@ class Blockchain:
             if not self.is_remote(node):
                 return True
         return False
+
+    def _do_spread(self):
+        """
+        Share node information with all registered nodes from this chain
+        and the remote chain.
+
+        :param node: <str> Current node
+        """
+
+        self.logger.info('starting spread...')
+        if not self.node.is_root:
+            data = get_json(f'{self.node.parent.host}/node')
+            if data:
+                self.revokeds.extend(data['revokeds'])
+                
+                for node_data in data['children']:
+                    node = simple_node_factory(node_data)
+                    if self.is_remote(node):
+                        self.node.add_sibling(node)
+                    
+                self.logger.debug('new siblings: %s', self.node.siblings)
+
+        min_votes = round((len(self.node.children) + 1 ) / 2)
+
+        for node in set(self.revokeds):
+            self.logger.debug('revokeds count: %d', self.revokeds.count(node))
+            if self.revokeds.count(node) < min_votes:
+                self.logger.debug('node was re-inserted: %s', node)
+                self.node.add_child(node)
+            else:
+                self.logger.debug(f'node was removed: {node}')
+        self.revokeds = []
+
+    def _do_validation(self):
+        """
+        Compute a hash function with each node endpoint that
+        matches the own server endpoint.
+        """
+
+        self.logger.info('starting validation...')
+        invalids = []
+        
+        for node in list(self.node.children):
+            # try to revoke without clearing predicate's cache
+            if self.revoke_node(node, clear=False):
+                invalids.append(node)
+        
+        # clear predicate's cache
+        self.predicate.clear_cache()
+
+        if invalids:
+            self.logger.debug('nodes invalid: %s', invalids)
+            send_to_nodes(invalids, self.nodes, method='delete')
+
 
 
 class NodePredicate:

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, Mock
 
 import requests
-from flask import current_app
+from blueprints.landing import get_node_chain, get_mail_chain
 
 
 def mock_proof(return_value=True):
@@ -9,8 +9,8 @@ def mock_proof(return_value=True):
 
 
 def mock_blockchain(name, impl=MagicMock, **kwargs):
-    setattr(current_app.blocks, name, impl(**kwargs))
-    return current_app.blocks
+    setattr(get_node_chain(), name, impl(**kwargs))
+    return get_node_chain()
 
 
 def bootstrap_on_lan():
@@ -19,11 +19,11 @@ def bootstrap_on_lan():
     """
 
     my_other_self = fake_node_list()[-1]
-    current_app.blocks.register_node(my_other_self)
+    get_mail_chain().register_node(my_other_self)
 
 
 def mock_node_predicate(blocks=None, **kwargs):
-    blocks = blocks or current_app.blocks
+    blocks = blocks or get_node_chain()
     blocks.predicate.is_valid = MagicMock(**kwargs)
 
 
@@ -36,7 +36,7 @@ def fake_node_list(myself=True):
         # this simulate two nodes on the same LAN
         port = 9999
         candidate = f'http://127.0.0.1:{port}'
-        while not current_app.blocks.is_remote(candidate):
+        while not get_node_chain().is_remote(candidate):
             port += 1
             candidate = f'http://127.0.0.1:{port}'
         nodes.append(candidate)
