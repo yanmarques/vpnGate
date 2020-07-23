@@ -33,6 +33,7 @@ This helps ilustrating the employee connecting to the private physical network t
 And when you are using the VPN to surf the web, or access (almost) the entire internet, one need to understand what is `the internet` for the computer. When one is learning about machine network addressing, routing and that stuff we eventually look something called route of last resort or just default route, this is a routing rule that instruct the kernel of the current operating system that, when any other route matches the given packet, send this one to the default route and beg for it to get a response. This is basically the internet for the computers, everything that is not found anywhere else. The address for this rule is the famous `0.0.0.0/0`, which the kernel translates to everything. And that is exactly what VPNs which lets you browse the internet do, they connects the client with all networks in the server (exception of localhost and some other user defined networks). Taking the same flow explained earlier, in the routing tables would exist a rule to the default route accessed through the VPN server.
 
 One more illustration about the VPN to surf the web.
+
     ____________________        Virtual Cable        ______________________
    | Private Net - User | <-----------------------> | Private Net - Server |
     --------------------                             ----------------------
