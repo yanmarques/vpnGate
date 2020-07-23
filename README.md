@@ -18,23 +18,31 @@ The solution found was to use a VPN. Different from username/password common aut
 To surf the web using a VPN, the way it is done is different from the previous use case. In the previous use case, the employees would only access some devices with the VPN, but the internet/web does not go through the VPN. Why this? We need to remember the principles, connect two remote networks. The employees would, for example, access the Corporation `10.10.10.0/24` physical network. This means that in the routing table, would exist a rule that the network `10.10.10.0/24` will be accessed through the VPN virtual interface, which would get an private IP address of the employee local virtual network.
 
 This helps ilustrating the employee connecting to the private physical network through the VPN.
-[!Employee to Corporation VPN](/images/corp-vpn.png)
 
-               ____________________        Virtual Cable        ______________________
-              | Private Net - User | <-----------------------> | Private Net - Server |
-               --------------------                             ----------------------
-                                                                           /|\
-                                                                            | 
-                                                                            |
-                                                                           \|/
-                                                                 __________________________
-                                                                | 0.0.0.0/0 - Physical Net |
-                                                                 __________________________
+     ________________________        Virtual Cable        __________________________________
+    | Private Net - Employee | <-----------------------> | Private Net - Corporation Server |
+     ------------------------                             ----------------------------------
+                                                                          /|\
+                                                                           | 
+                                                                           |
+                                                                          \|/
+                                                            ______________________________
+                                                           | 10.10.10.0/24 - Physical Net |
+                                                            ______________________________
                                                                       
 And when you are using the VPN to surf the web, or access (almost) the entire internet, one need to understand what is `the internet` for the computer. When one is learning about machine network addressing, routing and that stuff we eventually look something called route of last resort or just default route, this is a routing rule that instruct the kernel of the current operating system that, when any other route matches the given packet, send this one to the default route and beg for it to get a response. This is basically the internet for the computers, everything that is not found anywhere else. The address for this rule is the famous `0.0.0.0/0`, which the kernel translates to everything. And that is exactly what VPNs which lets you browse the internet do, they connects the client with all networks in the server (exception of localhost and some other user defined networks). Taking the same flow explained earlier, in the routing tables would exist a rule to the default route accessed through the VPN server.
 
 One more illustration about the VPN to surf the web.
-[!Web VPN](/images/web-vpn.png)
+    ____________________        Virtual Cable        ______________________
+   | Private Net - User | <-----------------------> | Private Net - Server |
+    --------------------                             ----------------------
+                                                                /|\
+                                                                 | 
+                                                                 |
+                                                                \|/
+                                                       __________________________
+                                                      | 0.0.0.0/0 - Physical Net |
+                                                       __________________________
 
 ### What are VPNs benefits
 This tool would provide VPN services. I will talk a little about the consequence of using VPNs, not the cause of these consequences. The sources I used to build this are spreaded into the internet, take a deep breadth and look for it. 
