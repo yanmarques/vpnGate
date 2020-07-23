@@ -40,10 +40,10 @@ One more illustration about the VPN to surf the web.
                                                                 /|\
                                                                  | 
                                                                  |
-                                                                \|/
-                                                       __________________________
-                                                      | 0.0.0.0/0 - Physical Net |
-                                                       __________________________
+                                                                \|/                                                       
+                                                      ______________________________       
+                                                     | 10.10.10.0/24 - Physical Net |
+                                                      ______________________________
 
 ### What are VPNs benefits
 This tool would provide VPN services. I will talk a little about the consequence of using VPNs, not the cause of these consequences. The sources I used to build this are spreaded into the internet, take a deep breadth and look for it. 
