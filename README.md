@@ -34,16 +34,14 @@ And when you are using the VPN to surf the web, or access (almost) the entire in
 
 One more illustration about the VPN to surf the web.
 
-    ____________________        Virtual Cable        ______________________
-   | Private Net - User | <-----------------------> | Private Net - Server |
-    --------------------                             ----------------------
-                                                                /|\
-                                                                 | 
-                                                                 |
-                                                                \|/                                                       
-                                                      ______________________________       
-                                                     | 10.10.10.0/24 - Physical Net |
-                                                      ______________________________
+      ____________________         Virtual Cable        ______________________
+     | Private Net - User | <------------------------> | Private Net - Server |
+      --------------------                              ----------------------
+                                                       
+                                                       
+                                                        __________________________
+                                                       | 0.0.0.0/0 - Physical Net |
+                                                        __________________________
 
 ### What are VPNs benefits
 This tool would provide VPN services. I will talk a little about the consequence of using VPNs, not the cause of these consequences. The sources I used to build this are spreaded into the internet, take a deep breadth and look for it. 
