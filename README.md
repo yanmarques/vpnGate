@@ -37,8 +37,10 @@ One more illustration about the VPN to surf the web.
       ____________________         Virtual Cable        ______________________
      | Private Net - User | <------------------------> | Private Net - Server |
       --------------------                              ----------------------
-                                                       
-                                                       
+                                                                 /|\
+                                                                  |
+                                                                  |
+                                                                 \|/
                                                         __________________________
                                                        | 0.0.0.0/0 - Physical Net |
                                                         __________________________
