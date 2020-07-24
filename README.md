@@ -56,25 +56,25 @@ This tool would provide VPN services. I will talk a little about the consequence
 
 This applies to every VPN service in general, not just this one specifically. But a VPN will (sometimes) protect you againts:
   - local adversaries from untrusted network. Eg.: coffee's, airport's, etc... Wifi
-  - IP based block. Eg.: your IP get banned from some service, when you use a VPN your IP is not showed to the mentioned service, so you are not blocked (unless your VPN's IP is also not blocked, right?!)
+  - IP based blocking. Eg.: your IP get banned from some service; when you use a VPN your IP is not showed to the mentioned service, so you are not blocked (unless your VPN's IP is also not blocked, right?!)
   
 It concludes that you are as private and secure as you were without a VPN.
   
 **The target people would be:**
   - poor ones, which do not have enough money to pay for a payed VPN service
   - entusiasts, which just want to test a VPN service
-  - anyone else which do not care about low-latency limited-bandwidth VPN service
+  - anyone else which do not care about high-latency limited-bandwidth VPN service
   
 ### So, why VPNs?
 I guess the mainly reason is that already exists a lot of excellent solutions for free out there, like Tor, I2P, Freenet, Zeronet, etc...   
 The only one which allows you to browse the internet is Tor, and it is the recommended method to do it privately. Altought there are basically two things that can be considered a con (it is like that for good reasons):
   - high-latency, you have increased random hops (generally 3) to your connection
-  - exit traffic is usually blocked by common services because of bad reputation (cyber attacks, bruteforcing). There is misconception that Tor is mainly blocked, but few services actively blocks Tor, it is blocked by previously reasons.
+  - exit traffic is usually blocked by common services because of bad reputation (cyber attacks, bruteforcing). There is misconception that Tor is blocked, but few services actively blocks Tor, it is blocked by previously reasons.
 
-So, one should surf the web with Tor, for privacy purposes. But if privacy is not a concern, I do not see the point to use it, actually you can get more exposed than you wanted. Here is where the VPN comes through, but if you are with me, it serves for very few purposes, so as any other software, it must be used carefully.
+So, one should surf the web with Tor, for privacy purposes. But if privacy is not a concern, I do not see the point to use it, actually you can get more exposed than you wanted. Here is where the VPN comes in, but if you are with me, it serves for very few purposes, so as any other software, it must be used carefully.
 
 # How it works
-After reading above topics about the _why to_ we get to the _how to_. As stated in this project description, it covers a free VPN service able to maintain itself. Now let's dig in about how I get to implement this, actually would get because I do not finished it, but the idea was already built. 
+After reading above topics about the _why to_ we come to the _how to_. As stated in this project description, it covers a free VPN service able to maintain itself. Now let's dig in about how I get to implement this, actually how I would implement it because I do not finished it, but the idea was already built. 
 
 ## Free? Auto maintain?
 I agree with everything takes a cost, and to keep these service free, it cost too. The mainly costs would be from the VPN server itself, because would need a VPS running the VPN software and also a public IP. The other big cost would be the web server where people would access in order to get the credentials to the VPN. I as maintainer would keep the VPN server on with donations and my own resources. The auto maintain part is about the web server, where would be developed a way to people around the world to help me and help others to access the web server. 
