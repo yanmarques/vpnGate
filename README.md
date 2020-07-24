@@ -119,6 +119,7 @@ These machines would be responsable of:
 
 #### Endpoints
 Now we disccuss about how endpoints should work. By now, everything is done over HTTP(S).
+
 **GET /**
 
 It exposes a html page, with some javascript code to miner for a POW. Whenever someone hits it, the app should perform operations to get the latest contents from other machines, and then return the page with this updated contents. This is because the user will miner the new POW from the latest POW. 
@@ -129,7 +130,55 @@ It exposes a html page, with some javascript code to miner for a POW. Whenever s
 
 It exposes a html page with a list of links to known nodes, which should have the same content.
 
+Return status 200.
+
 **POST /register**
 
-It receives the user email as a form request. First the blockchain should be exchanged, POW and email validated, then a new transaction with the email would occur and one more exchange would happen with the updated blockchain.
+It receives the user `email` and `proof` as a form request. First the blockchain should be exchanged, POW and email validated, then a new transaction with the email would occur and one more exchange would happen with the updated blockchain.
 
+Return statuses:
+  - 302 redirect to `/` with errors in the form
+  - 200 with a success html page
+
+**POST /bootstrap**
+
+It receives a request for a node to join in the nodes blockchain. It receives a `host` form request parameter which is the public accessible node address, and a `proof` for the node blockchain. The returned data is an access token used to exchange information with other, and the information about the node wich just registered the incoming node, and the identifier of the incoming node.
+
+On this action, the app should perform a bunch of validations, always calling others to vote about decisions, like:
+  - is this node accessible? make a GET request to it
+  - does this node contains correct contents? make some checksums
+  - was this host ever revoked in the past?
+
+Return statuses:
+  - 400 when missing parameters or invalid POW or host
+  - 201 when node was registered successfully
+  
+This validations are very basic, but protects against malicious minded guys trying to impersonate people into giving their email to them, as this is the only action users actully do, we must practice caution though. 
+
+**OBS: The above endpoints are protected by the access token given to bootstrapped machines**
+
+To access a protected endpoint, one must pass some parameters in the request headers, as the following:
+  - `Authorization: Bearer <access token>`
+  - `X-Node-Id: <node identifier>`
+
+**[GET,PUT] /\<name>/chain**
+
+It list or update some blockchain, and the `name` url parameter is the name of blockchain given blockchain. When updating, one should provide a `chain` form request parameter.
+
+Currently, the blockchain names is one of:
+  - node
+  - mail
+
+Return statuses:
+  - 404 when blockchain name was invalid
+  - 400 when missing parameter
+  - 200 otherwise
+
+**[GET,DELETE] /node**
+
+It list or revoke nodes in the node blockchain. When listing, the returned data is the children of the current node, and their list of revoked nodes. When revoking, it receives a list of nodes identifiers as `nodes` form request parameter. 
+
+Return statuses:
+  - 400 when method DELETE with missing parameters
+  - 204 when revoked successfully
+  - 200 otherwise
