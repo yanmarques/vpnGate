@@ -83,9 +83,9 @@ These implementation is where the magic begins, I would say. The next topics wil
 
 **What are blockchain?**
 
-A data structure which holds data with a signature of this data and a value that proves you can create the assigned data. This value is usually called `proof of work` (POW), and generally it is a number very hard to find, computationally speaking, but easily to verify it's correctness. It means that every time you want to submit some `block` of data, one have to prove that spent some time looking for a proof of work. And how does this tool benefits from this? Well, the tool would use the very basic concept of proof of work, where each new user who wanted access to the VPN service, would have to spent some time calcultating the proof of work. This is not the perfect solution, based that powerfull computers would find the POW faster than slower ones.
+A data structure which holds data with a signature of this data and a value that proves you can create the assigned data. This value is usually called `proof of work` (POW), and generally it is a number very hard to find, computationally speaking, but easily to verify it's correctness. It means that every time you want to submit some `block` of data, one have to prove that spent some time looking for a proof of work. And how does this tool benefits from this? Well, the tool would use the very basic concept of proof of work, where each new user who wanted access to the VPN service, would have to spent some time calcultating the proof of work. This is not the perfect solution, based that powerfull computers would find POW faster than slower ones.
 
-The blockchain alone is just a piece of static democratized data. It needs to be accessed externally from other parties to exchange information. That part is addressed in the next topic.
+A blockchain alone is just a piece of static democratized data. It needs to be accessed externally from other parties to exchange information. That part is addressed in the next topic.
 
 ### Blockchain API
 The machine needs to gather information from other machines, and send its own information to other machines. But what machines to exchange information to? When to send information to other machines? Should we trust information from other machines? 
@@ -94,35 +94,35 @@ Well these are hard questions to answer, and generally the main ones. That being
 
 **What are the machines we should exchange information?**
 
-Like every other peer-to-peer software, yes we are talking about P2P applications, we need an initial environment. The first machine has the function to help others (and itself by the way) to initiate the distributed network. This mentioned process is usually called bootstrapping.
+Like every other peer-to-peer software, yes we are talking about P2P applications, we need an initial environment. The first machine has the function to help others (and itself) to initiate the distributed network. This mentioned process is usually called bootstrapping.
 
 **Should we trust information from other machines?**
 
-The tool would do the following: verify then trust. The blockchain will try to validate every block in the chain first, and it can do that by checking the proof of work and the hash calculated from the lastest blocks. When the blockchain was verified and do not have other choice other than but trust this new blockchain. Certainly every machine should only accept blockchains from known parties.
+The tool would do the following: check then trust. The blockchain will first try to validate every block in the chain, and it can do that by checking the proof of work and the hash calculated from the lastest blocks. When the blockchain was verified there is no other option but to trust this new blockchain. Certainly every machine should only accept blockchains from known parties.
 
 **When to send information to other machines?**
 
 Another protocols of P2P communication distribution, like gossip protocol, do exchange info with high frequency. However it can be changed according to application needs. For this tool, we must ensure that every machine gets the latest contents. Why? This is because the blockchain could get inconsistent. Let us take an example:
 
-Two machines are running the user's mail blockchain, and both are known to each other, so they can exchange their blockchains. There are huge latency in the network, that means the time to do exchanges are large. Then some client register himself into the first machine, later on the blockchain of the first machine is changed. In the meanwhile, another client register himself into the second machine, and again the blockchain of the second machine is changed. Now we have two blockchains different in the timeline. Assuming this happened very quickly, now the machines received updated information from each other, both verified the blockchain is valid, but the size of the received blockchain equals its own blockchain, and they stupidly assume there is nothing to update, so both became inconsistent. 
+Two machines are running the user's mail blockchain, and both are known to each other, so they can exchange their blockchains. There are huge latency in the network, that means the time to do exchanges are large. Then some client register himself into the first machine, later on the blockchain of the first machine is changed. In the meanwhile, another client register himself into the second machine, and the blockchain of the second machine is changed. Now we have two blockchains different in the timeline. Assuming this happened very quickly, now the machines received updated information from each other, both verified the blockchain is valid, but the size of the received blockchain equals its own blockchain, and they stupidly assume there is nothing to update, so both became inconsistent. 
 
-The above situation is very hard to solve and also very hard to happen but not impossible. One way to handle this, is to choose  one blockchain as correct, and discard the other, meaning that one of the clients would be left over. It shows that when anything is changed, every other machine should be notified about it. 
+The above situation is very hard to solve and also very hard to happen but not impossible. One way to handle this, is to choose  one blockchain as correct, and discard the other, meaning that one of the clients would be forgotten. It shows that when anything is changed, every other machine should be notified about it. 
 
-As we can also notice, there is one special place to occur incosistencies, the register action. At the register action, it could implement a method to force some exchange with others, then register the user, and later notifying others about what just changed. It means a long wait for the user when registering, but I guess this is not a big deal, although it could be masked with some javascript code and fancy stuff on the client side.
+As we can also notice, there is one special place to occur incosistencies, the register action. At the register action, could be implemented a method to force some exchange with others, then register the user, and later notifying others about what just changed. It means a long wait for the user when registering, but I guess this is not a big deal, although it could be masked with some javascript code and fancy stuff on the client side.
 
 ### Web Server
 Machines running the web server, would also participate in a blockchain specifically for user's email address, which the VPN server also participates.
 
 These machines would be responsable of:
-  - exposing the web page with content to the user calculate the proof of work in their machines (using javascript) 
+  - expose the web page with content to the user calculate the proof of work in their machines (using javascript) 
   - verifying users proof of work and appending user email to the blockchain wheter it not exists already 
 
-#### Endpoints
+#### Web Endpoints
 Now we disccuss about how endpoints should work. By now, everything is done over HTTP(S).
 
 **GET /**
 
-It exposes a html page, with some javascript code to miner for a POW. Whenever someone hits it, the app should perform operations to get the latest contents from other machines, and then return the page with this updated contents. This is because the user will miner the new POW from the latest POW. 
+It exposes a html page, with some javascript code for mining a POW. Whenever someone hits it, the app should perform operations to get the latest contents from other machines, and then return the page with this updated contents. This is because the user will miner the new POW from the latest POW. 
 
 \# TODO document a method to verify machines are exposing correct html/css/js contents.
 
