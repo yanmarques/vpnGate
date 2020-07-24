@@ -1,6 +1,10 @@
 # vpnGate
 Free auto-maintain VPN service to surf the web.
 
+The main reason I stopped developing this is because I lost some work which was offline and I got really pissed off, and also because I had to focus on another personal stuff.
+
+So I am decided to finish this work as a proof of concept. I have started to document things (which I had not, very very bad). But if you got interested you can check the [tree-token](https://github.com/yanmarques/vpnGate/tree/tree-token) branch which is the latest one, notice that the file `lib/node.py` is missing because of wrong code base management, I am trying to get it better though. But you can check the tests  and the code at `blueprints/{blocks.py,landing.py}` to get an idea of what it does under the hood.
+
 # Nice idea, but mainly impratical
 ## How it began?
 I started developing this tool (I call this a tool based on this not being a simple program you run in your computer) because I was really concerned about my digital privacy and security. Firstly, as always, after a lot of research about the topic I was even more lost than before it. Anyways, when one paranoid person (like me) starts to wonder about too much thing that could happen, the focus is easily lost and the main reason is forgotten. This tool is the consequence of this process, besides I learned a lot ;)
@@ -69,6 +73,29 @@ The only one which allows you to browse the internet is Tor, and it is the recom
 
 So, one should surf the web with Tor, for privacy purposes. But if privacy is not a concern, I do not see the point to use it, actually you can get more exposed than you wanted. Here is where the VPN comes through, but if you are with me, it serves for very few purposes, so as any other software, it must be used carefully.
 
+# How it works
+After reading above topics about the _why to_ we get to the _how to_. As stated in this project description, it covers a free VPN service able to maintain itself. Now let's dig in about how I get to implement this, actually would get because I do not finished it, but the idea was already built. 
 
+## Free? Auto maintain?
+I agree with everything takes a cost, and to keep these service free, it cost too. The mainly costs would be from the VPN server itself, because would need a VPS running the VPN software and also a public IP. The other big cost would be the web server where people would access in order to get the credentials to the VPN. I as maintainer would maintain the VPN server on with donations and my own resources. The auto maintain part is about the web server, where would be developed a way to people around the world to help me and help others to access the web server. 
 
+These implementation is where the magic begins, I would say. The next topics will be presented in detail how all this would be possible. But some introduction is advised. In the time I started to write this tool I was learning to play with blockchains, and what it is used for and how it works. So spoiler, all the implementation details covers using blockchains to democratise and distribute data. Let's talk a little about blockchains (one should look elsewhere for more details).
+
+**What are blockchain?**
+
+A data structure which holds data with a signature of this data and a value that proves you can create the assigned data. This value is usually called `proof of work` (POW), and generally it is a number very hard to find, computationally speaking, but easily to verify it's correctness. It means that every time you want to submit some `block` of data, one have to prove that spent some time looking for a proof of work. And how does this tool benefits from this? Well, the tool would use the very basic concept of proof of work, where each new user who wanted access to the VPN service, would have to spent some time calcultating the proof of work. This is not the perfect solution, based that powerfull computers would find the POW faster than slower ones.
+
+The blockchain alone is just a piece of static democratized data. It needs to be accessed externally from other parties to exchange information. That part is aborded the next topic.
+
+### Blockchain API
+The machine needs to gather information from other machines, and send its own information to other machines. But what machines to exchange information to? When to send information to other machines? Should we trust information from other machines? 
+
+Well these are hard questions to answer, and generally the main ones.
+
+### Web Server
+Machines running the web server, would also participate in a blockchain specifically for user's email address, which the VPN server also participates.
+
+These machines would be responsable of:
+  - exposing the web page with content to the user calculate the proof of work in their machines (using javascript) 
+  - verifying users proof of work and appending user email to the blockchain wheter it not exists already 
 
