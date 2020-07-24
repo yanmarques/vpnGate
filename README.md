@@ -79,13 +79,13 @@ After reading above topics about the _why to_ we get to the _how to_. As stated 
 ## Free? Auto maintain?
 I agree with everything takes a cost, and to keep these service free, it cost too. The mainly costs would be from the VPN server itself, because would need a VPS running the VPN software and also a public IP. The other big cost would be the web server where people would access in order to get the credentials to the VPN. I as maintainer would keep the VPN server on with donations and my own resources. The auto maintain part is about the web server, where would be developed a way to people around the world to help me and help others to access the web server. 
 
-These implementation is where the magic begins, I would say. The next topics will be presented in detail how all this would be possible. But some introduction is advised. In the time I started to write this tool I was learning to play with blockchains, and what it is used for and how it works. Spoieler ementation details covers using blockchains to democratise and distribute data. Let's talk a little about blockchains (one should look elsewhere for more details).
+These implementation is where the magic begins, I would say. The next topics will be presented in detail how all this would be possible. But some introduction is advised. In the time I started to write this tool I was learning to play with blockchains, and what it is used for and how it works. Spoiler: all implementation details are done using blockchains to democratise and in a certain way distribute data. Let's talk a little about blockchains (one should look elsewhere for more details).
 
 **What are blockchain?**
 
 A data structure which holds data with a signature of this data and a value that proves you can create the assigned data. This value is usually called `proof of work` (POW), and generally it is a number very hard to find, computationally speaking, but easily to verify it's correctness. It means that every time you want to submit some `block` of data, one have to prove that spent some time looking for a proof of work. And how does this tool benefits from this? Well, the tool would use the very basic concept of proof of work, where each new user who wanted access to the VPN service, would have to spent some time calcultating the proof of work. This is not the perfect solution, based that powerfull computers would find the POW faster than slower ones.
 
-The blockchain alone is just a piece of static democratized data. It needs to be accessed externally from other parties to exchange information. That part is aborded the next topic.
+The blockchain alone is just a piece of static democratized data. It needs to be accessed externally from other parties to exchange information. That part is addressed in the next topic.
 
 ### Blockchain API
 The machine needs to gather information from other machines, and send its own information to other machines. But what machines to exchange information to? When to send information to other machines? Should we trust information from other machines? 
@@ -94,21 +94,21 @@ Well these are hard questions to answer, and generally the main ones. That being
 
 **What are the machines we should exchange information?**
 
-Like every other peer-to-peer software, yes we are talking about P2P applications, we need an initial environment. The first machine, also called node, has the function to help others (and itself by the way) to initiate the distributed network. This mentioned process is usually called bootstrapping.
+Like every other peer-to-peer software, yes we are talking about P2P applications, we need an initial environment. The first machine has the function to help others (and itself by the way) to initiate the distributed network. This mentioned process is usually called bootstrapping.
 
 **Should we trust information from other machines?**
 
-The tool would to the following: verify then trust. The blockchain will try to validate every block in the chain first, and it can do that by checking the proof of work and the hash calculated from the lastest blocks. When the blockchain was verified and do not have other choice other than but trust this new blockchain. Certainly every machine should only accept blockchains from known parties.
+The tool would do the following: verify then trust. The blockchain will try to validate every block in the chain first, and it can do that by checking the proof of work and the hash calculated from the lastest blocks. When the blockchain was verified and do not have other choice other than but trust this new blockchain. Certainly every machine should only accept blockchains from known parties.
 
 **When to send information to other machines?**
 
-Another protocols of P2P communication distribution, like gossip protocol, do exchange info in a rapdly rate based. Altough it can be changed accordingly for application needs. For this tool, we must ensure that every machine gets the latest contents. Why? This is because the blockchain could get inconsistent. Let us take an example:
+Another protocols of P2P communication distribution, like gossip protocol, do exchange info with high frequency. However it can be changed according to application needs. For this tool, we must ensure that every machine gets the latest contents. Why? This is because the blockchain could get inconsistent. Let us take an example:
 
-Two machines are running the user's mail blockchain, and both are known to each other, so they can exchange their blockchains. There are huge latency in the network, that means the time to do exchanges are large. Then some client register himself into the first machine, later on the blockchain of the first machine is changed. In the meanwhile, another client register himself into the second machine, and again the blockchain of the second machine is changed. Now we have two blockchains different in the timeline. Assuming this happened very quickly, now the machines received updated information from each other, both verified the blockchain is valid, but the size of the received blockchain equals theis own blockchain, and they dumbly assume there is nothing to update, so both became inconsistent. 
+Two machines are running the user's mail blockchain, and both are known to each other, so they can exchange their blockchains. There are huge latency in the network, that means the time to do exchanges are large. Then some client register himself into the first machine, later on the blockchain of the first machine is changed. In the meanwhile, another client register himself into the second machine, and again the blockchain of the second machine is changed. Now we have two blockchains different in the timeline. Assuming this happened very quickly, now the machines received updated information from each other, both verified the blockchain is valid, but the size of the received blockchain equals its own blockchain, and they stupidly assume there is nothing to update, so both became inconsistent. 
 
-The above situation is very hard to solve and also very hard to happen but not impossible, and to conclude, one of the blockchains would had to be choosen as correct, and the other would be discarded, meaning that one of the clients would be left over. It shows that when anything is changed, every other machine should be notified about it. 
+The above situation is very hard to solve and also very hard to happen but not impossible. One way to handle this, is to choose  one blockchain as correct, and discard the other, meaning that one of the clients would be left over. It shows that when anything is changed, every other machine should be notified about it. 
 
-As we can also notice, there is one special place to occur incosistencies, the register action. At the register action, it could implement a method to force some exchange with others, then register the user, and later notifying others about what just changed. It means a long wait for the user when registering, but I guess this is not a big deal, although it could be masqueraded with some javascript code and fancy stuff on the client side.
+As we can also notice, there is one special place to occur incosistencies, the register action. At the register action, it could implement a method to force some exchange with others, then register the user, and later notifying others about what just changed. It means a long wait for the user when registering, but I guess this is not a big deal, although it could be masked with some javascript code and fancy stuff on the client side.
 
 ### Web Server
 Machines running the web server, would also participate in a blockchain specifically for user's email address, which the VPN server also participates.
@@ -149,11 +149,11 @@ On this action, the app should perform a bunch of validations, always calling ot
   - does this node contains correct contents? make some checksums
   - was this host ever revoked in the past?
 
+This validations are very basic, but protects against malicious minded guys trying to impersonate people into giving their email to them, as this is the only action users actually do, we must practice caution though. 
+
 Return statuses:
   - 400 when missing parameters or invalid POW or host
   - 201 when node was registered successfully
-  
-This validations are very basic, but protects against malicious minded guys trying to impersonate people into giving their email to them, as this is the only action users actully do, we must practice caution though. 
 
 **OBS: The above endpoints are protected by the access token given to bootstrapped machines**
 
