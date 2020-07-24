@@ -118,7 +118,7 @@ Not much didatic content there exists in the web, but with my graph college stud
   - connected, any two vertices are connected by exactly one path
   - acyclic, it means there no cycles
 
-[Example image of a tree](https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Tree_graph.svg/180px-Tree_graph.svg.png)
+[!Example image of a tree](https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Tree_graph.svg/180px-Tree_graph.svg.png)
 
 The big deal here, is to structure the tree in a correct manner. I mean, when the tree is build, or even rebuild, we must ensure every layer of nodes, do not exceed some threshold, and that would keep the tree balanced.
 
