@@ -163,7 +163,7 @@ To access a protected endpoint, one must pass some parameters in the request hea
 
 **[GET,PUT] /\<name>/chain**
 
-It list or update some blockchain, and the `name` url parameter is the name of blockchain given blockchain. When updating, one should provide a `chain` form request parameter.
+It list or update some blockchain, and the `name` path parameter is the name of the target blockchain. When updating, one should provide a `chain` form request parameter.
 
 Currently, the blockchain names is one of:
   - node
