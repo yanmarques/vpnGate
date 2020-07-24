@@ -69,7 +69,7 @@ It concludes that you are as private and secure as you were without a VPN.
 I guess the mainly reason is that already exists a lot of excellent solutions for free out there, like Tor, I2P, Freenet, Zeronet, etc...   
 The only one which allows you to browse the internet is Tor, and it is the recommended method to do it privately. Altought there are basically two things that can be considered a con (it is like that for good reasons):
   - high-latency, you have increased random hops (generally 3) to your connection
-  - exit traffic is usually blocked by common services because of bad reputation (cyber attacks, bruteforcing). There is misconception that Tor is mainly blocked, but few services activetaly blocks Tor, it is blocked by previously reasons.
+  - exit traffic is usually blocked by common services because of bad reputation (cyber attacks, bruteforcing). There is misconception that Tor is mainly blocked, but few services actively blocks Tor, it is blocked by previously reasons.
 
 So, one should surf the web with Tor, for privacy purposes. But if privacy is not a concern, I do not see the point to use it, actually you can get more exposed than you wanted. Here is where the VPN comes through, but if you are with me, it serves for very few purposes, so as any other software, it must be used carefully.
 
@@ -77,9 +77,9 @@ So, one should surf the web with Tor, for privacy purposes. But if privacy is no
 After reading above topics about the _why to_ we get to the _how to_. As stated in this project description, it covers a free VPN service able to maintain itself. Now let's dig in about how I get to implement this, actually would get because I do not finished it, but the idea was already built. 
 
 ## Free? Auto maintain?
-I agree with everything takes a cost, and to keep these service free, it cost too. The mainly costs would be from the VPN server itself, because would need a VPS running the VPN software and also a public IP. The other big cost would be the web server where people would access in order to get the credentials to the VPN. I as maintainer would maintain the VPN server on with donations and my own resources. The auto maintain part is about the web server, where would be developed a way to people around the world to help me and help others to access the web server. 
+I agree with everything takes a cost, and to keep these service free, it cost too. The mainly costs would be from the VPN server itself, because would need a VPS running the VPN software and also a public IP. The other big cost would be the web server where people would access in order to get the credentials to the VPN. I as maintainer would keep the VPN server on with donations and my own resources. The auto maintain part is about the web server, where would be developed a way to people around the world to help me and help others to access the web server. 
 
-These implementation is where the magic begins, I would say. The next topics will be presented in detail how all this would be possible. But some introduction is advised. In the time I started to write this tool I was learning to play with blockchains, and what it is used for and how it works. So spoiler, all the implementation details covers using blockchains to democratise and distribute data. Let's talk a little about blockchains (one should look elsewhere for more details).
+These implementation is where the magic begins, I would say. The next topics will be presented in detail how all this would be possible. But some introduction is advised. In the time I started to write this tool I was learning to play with blockchains, and what it is used for and how it works. Spoieler ementation details covers using blockchains to democratise and distribute data. Let's talk a little about blockchains (one should look elsewhere for more details).
 
 **What are blockchain?**
 
