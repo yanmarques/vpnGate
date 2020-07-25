@@ -113,20 +113,20 @@ As we can also notice, there is one special place to occur incosistencies, the r
 #### Consensus
 Consensus is an algorithm used to exchange chains with others using a blockchain. There exists many consensus algorithms, but this tool requires a custom one. As explained earlier, we must ensure everyone gets the latest content. So whenever something changes, everyone in the network should be notified. We get now into a question, how to contact every node in the network, with the lowest effort. The network we are looking for is a distributed network, with a peer-to-peer connection, however every node can reach every other node in the network by a neighbour.
 
-Not much didatic content there exists in the web, but with my graph college studies, I could mix some principles until getting what I was looking for. I am going to show a tree (from graph theory) architecture, its corresponding properties are:
+Not much didatic content there exists in the web, but with my graph college studies, I could mix some principles until getting what I was looking for. I am going to show a graph architecture, with the corresponding properties:
   - undirected, vertices flow in and out
-  - connected, any two vertices are connected by exactly one path
-  - acyclic, it means there no cycles
+  - every subgraph is a complete graph
+  - every subgraph may or may not be connected with another subgraph, also called children
 
-![Example image of a tree](https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Tree_graph.svg/180px-Tree_graph.svg.png)
+![Example of a complete graph](https://upload.wikimedia.org/wikipedia/commons/b/be/3-simplex_graph.svg)
 
-The big deal here, is to structure the tree in a correct manner. I mean, when the tree is build, or even rebuild, we must ensure every layer of nodes, do not exceed some threshold, and that would keep the tree balanced.
+The big deal here, is to structure the graph in a correct manner. I mean, when the structure is build, or even rebuild, we must ensure every layer of nodes, do not exceed some threshold, and that would keep the structure balanced.
 
-Spreading information on the tree, would require at most `2 + N` requests, where N is the threshold of nodes per layer. Let us make step by step.
-  - the source node decides to spread information, so it would ask his parent node, a random child, and it's simblings, wheter all they exists, to spread the updated information.
-  - the root would (maybe) receive a request to spread information from a child, and because the source was a registered child, it would perform the same operation as the source node just did, however would not send to any child.
+To spread information across the nodes, requires at most `2 + N` requests, where N is the threshold of nodes per layer and 2 is because the node will try to contact a parent and one random child. Let us make step by step.
+  - the source node decides to spread information, so it would ask his parent node, a random child, and it's siblings, wheter all they exists, to spread the updated information.
+  - the parent would (maybe) receive a request to spread information from a child, and because the source was a registered child, it would perform the same operation as the source node just did, however would not send to any child.
   - a random child would (maybe) receive a request to spread information from a parent, and because the source was a registered parent, it would perform the same operation as the source node just did, however would not send to the parent.
-  - the simbling node would receive a request to spread information from a simbling, and because the source was a registered simbling, it would only send to a random child, wheter it exists.
+  - the sibling node would receive a request to spread information from a sibling, and because the source was a registered sibling, it would only send to a random child, wheter it exists.
 
 Look at this gif:
 
