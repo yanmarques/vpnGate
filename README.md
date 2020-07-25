@@ -128,6 +128,9 @@ Spreading information on the tree, would require at most `2 + N` requests, where
   - a random child would (maybe) receive a request to spread information from a parent, and because the source was a registered parent, it would perform the same operation as the source node just did, however would not send to the parent.
   - the simbling node would receive a request to spread information from a simbling, and because the source was a registered simbling, it would only send to a random child, wheter it exists.
 
+Look at this gif:
+![Gif representing a spread with an random network](/spread.gif)
+
 ### Web Server
 Machines running the web server, would also participate in a blockchain specifically for user's email address, which the VPN server also participates.
 
