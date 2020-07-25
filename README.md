@@ -130,7 +130,7 @@ To spread information across the nodes, requires at most `2 + N` requests, where
 
 Look at this gif:
 
-![Gif representing a spread with an random network](/spread-forest.gif)
+![Gif representing a spread with an random network](/k-spread.gif)
 
 ### Web Server
 Machines running the web server, would also participate in a blockchain specifically for user's email address, which the VPN server also participates.
