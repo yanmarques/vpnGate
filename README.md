@@ -13,3 +13,6 @@ I started developing this tool (I call this a tool based on this not being a sim
 A lot. Actually more than I can put in words, but I will try to summarize some. 
 I was always interested about security, dev-ops and that kind of stuff, but learn these by yourself was hard in the beggining. The time is gone and now after a few years of experience it kinda takes an automatically flow in my mind, this is not something you can learn in college, online courses, wathever...
 Moving on, in the researchs I've made, I got to the conclusion that one can not (easily) have privacy AND security together, at least stronger ones. Generally, it is a choice one has to make.
+
+# Wiki
+If you are looking for ideas, principles and some implementation details, I've got a Wiki page for you [here](/wiki).
