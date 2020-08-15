@@ -1,8 +1,8 @@
 from vpngate.util import crypto
+import pytest
 
 import uuid
 import hashlib
-import pytest
 
 
 @pytest.mark.asyncio
