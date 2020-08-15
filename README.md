@@ -15,4 +15,4 @@ I was always interested about security, dev-ops and that kind of stuff, but lear
 Moving on, in the researchs I've made, I got to the conclusion that one can not (easily) have privacy AND security together, at least stronger ones. Generally, it is a choice one has to make.
 
 # Wiki
-If you are looking for ideas, principles and some implementation details, I've got a Wiki page for you [here](/wiki).
+If you are looking for ideas, principles and some implementation details, I've got a Wiki page for you [here](https://github.com/yanmarques/vpnGate/wiki).
