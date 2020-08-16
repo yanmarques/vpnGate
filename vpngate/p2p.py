@@ -1,4 +1,4 @@
-from .util.crypto import KeyPair
+from .util.crypto import KeyVerifier, KeyPair
 
 from typing import Set, Any
 from dataclasses import dataclass, field
@@ -13,7 +13,7 @@ class Peer:
     """
 
     address: str
-    keys: KeyPair = field(default_factory=KeyPair)
+    keys: KeyVerifier = field(default_factory=KeyPair)
     children: Set[Any] = field(default_factory=set)
     siblings: Set[Any] = field(default_factory=set)
     parent: Any = field(default=None)
