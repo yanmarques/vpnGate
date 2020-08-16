@@ -73,7 +73,11 @@ class BlocksManager:
         return self.next_index
 
 
-def pow_chain():
+def pow_chain() -> Tree:
+    """
+    Function used to create a chain of Proof of Work blocks.
+    """
+
     root = RootNode(block=building.PoWBlock.genesis())
     return Tree(root=root)
 
