@@ -5,16 +5,8 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.exceptions import InvalidSignature
 
 import json
-import uuid
 import hashlib
 import base64
-
-
-def hex_uuid():
-    """Returns an hexadecimal representation of an random UUID."""
-
-    unique_id = uuid.uuid4()
-    return unique_id.hex
 
 
 def block_hashsum(block: building.Block, impl=hashlib.sha256):
