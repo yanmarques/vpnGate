@@ -6,6 +6,12 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Peer:
+    """
+    Class used to hold information about a remote or local peer. It may also
+    be used to contact a peer using it's address. Altough, it is uniquely 
+    identified by it's public key, also used for comparison operations.
+    """
+
     address: str
     keys: KeyPair = field(default_factory=KeyPair)
     children: Set[Any] = field(default_factory=set)
