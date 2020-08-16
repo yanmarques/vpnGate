@@ -23,7 +23,7 @@ class Block:
     def genesis(cls):
         """Create the default first block in the chain"""
 
-        return cls(index=1,
+        return cls(index=0,
                    transactions=[],
                    proof=100,
                    previous_hash='1',
