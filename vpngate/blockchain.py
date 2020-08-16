@@ -1,8 +1,8 @@
 from .util import crypto, building
-from .chains import Tree
+from .chains import Tree, RootNode
 from .p2p import Peer
 
-from typing import Tuple
+from typing import Tuple, Callable
 from dataclasses import dataclass, field
 import hashlib
 import time
@@ -19,6 +19,8 @@ class BlocksManager:
 
     transactions: list = field(default_factory=list)
     chain: Tree = field(default_factory=Tree)
+
+    block_factory: Callable = building.Block
 
     @property
     def last_block(self) -> building.Block:
@@ -38,22 +40,8 @@ class BlocksManager:
 
         return self.last_block.index + 1
 
-    def get_info(self, block: building.Block=None) -> Tuple[int, str]:
-        """
-        Get the last proof of work and the hash of the last
-        block on the chain.
 
-        :return: Proof of work and the hash
-        """
-
-        last_block = block or self.last_block
-        last_block_sum = crypto.block_hashsum(last_block) 
-        return last_block.proof, last_block_sum
-
-    def new_block(self, 
-                  proof: int, 
-                  previous_hash: str=None, 
-                  timestamp: time.time=None) -> building.Block:
+    def new_block(self, **kwargs) -> building.Block:
         """
         Create a new Block in the Blockchain
 
@@ -61,10 +49,14 @@ class BlocksManager:
         :param previous_hash: Hash of previous Block
         """
 
-        block = building.Block(index=self.next_index,
-                               transactions=self.transactions,
-                               proof=proof,
-                               previous_hash=previous_hash or self.get_info()[1])
+        if 'previous_hash' in kwargs:
+            kwargs.setdefault('previous_hash', 
+                              crypto.block_hashsum(self.last_block))
+
+        # this are overwritten
+        kwargs.update(index=self.next_index, transactions=self.transactions)
+
+        block = self.block_factory(**kwargs)
 
         # Reset the current transactions
         self.transactions = []
@@ -84,9 +76,16 @@ class BlocksManager:
         return self.next_index
 
 
+def pow_chain():
+    root = RootNode(block=building.PoWBlock.genesis())
+    return Tree(root=root)
+
+
 @dataclass
 class PoWBlockChain(BlocksManager):
     difficulty: int
+    block_factory: Callable = building.PoWBlock
+    chain: Tree = field(default_factory=pow_chain)
 
     def new_block(self, **kwargs) -> building.Block:
         """
@@ -96,6 +95,18 @@ class PoWBlockChain(BlocksManager):
         if 'proof' not in kwargs:
             kwargs.update(proof=self.proof_of_work())
         return super().new_block(**kwargs)
+
+    def get_info(self, block: building.Block=None) -> Tuple[int, str]:
+        """
+        Get the last proof of work and the hash of the last
+        block on the chain.
+
+        :return: Proof of work and the hash
+        """
+
+        last_block = block or self.last_block
+        last_block_sum = crypto.block_hashsum(last_block) 
+        return last_block.proof, last_block_sum
 
     def proof_of_work(self, last_block: building.Block=None) -> int:
         """
