@@ -19,32 +19,6 @@ def test_genesis_block_is_not_created_with_non_empty_chain():
     assert blocks.chain == chain
 
 
-def test_get_last_info_returns_the_newest_proof():
-    expected_proof = 321
-    
-    blocks = get_blocks_manager()
-    blocks.new_block(expected_proof, 'bar')
-
-    proof, _ = blocks.get_info()
-
-    assert proof == expected_proof
-
-
-def test_last_info_of_new_blocksmngr_returns_a_hashsum_of_the_genesis(monkeypatch):
-    expected_hash = 'baz'
-    
-    def my_hashsum(block, **kwargs):
-        assert_is_genesis_block(block)
-        return expected_hash
-
-    monkeypatch.setattr(crypto, 'block_hashsum', my_hashsum)
-
-    blocks = get_blocks_manager()
-    _, last_hash = blocks.get_info()
-
-    assert last_hash == expected_hash
-
-
 def test_newly_created_block_returns_a_valid_first_block():
     blocks = get_blocks_manager()
     block = blocks.new_block()
