@@ -20,7 +20,7 @@ class BlocksManager:
     transactions: list = field(default_factory=list)
     chain: Tree = field(default_factory=Tree)
 
-    block_factory: building.Block = building.Block
+    block_factory: building.Block = field(default=building.Block)
 
     @property
     def last_block(self) -> building.Block:
@@ -84,9 +84,9 @@ def pow_chain() -> Tree:
 
 @dataclass
 class PoWBlockChain(BlocksManager):
-    difficulty: int = 3 
+    difficulty: int = field(default=3) 
 
-    block_factory: Callable = building.PoWBlock
+    block_factory: building.Block = field(default=building.PoWBlock)
     chain: Tree = field(default_factory=pow_chain)
 
     def new_block(self, **kwargs) -> building.Block:

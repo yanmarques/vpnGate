@@ -39,4 +39,4 @@ class Block:
 
 @dataclass
 class PoWBlock(Block):
-    proof: int = 100
+    proof: int = field(default=100)

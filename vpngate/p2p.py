@@ -16,7 +16,7 @@ class Peer:
     keys: KeyPair = field(default_factory=KeyPair)
     children: Set[Any] = field(default_factory=set)
     siblings: Set[Any] = field(default_factory=set)
-    parent: Any = None
+    parent: Any = field(default=None)
 
     @property
     def identifier(self) -> str:
