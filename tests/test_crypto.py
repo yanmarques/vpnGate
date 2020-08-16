@@ -49,18 +49,18 @@ def test_hashsum_with_custom_hashing_implementation():
 
 def test_key_pair_identifies_signed_data():
     data = b'some random data'
-    pair = crypto.KeyPair()
+    pair = crypto.AsymmetricKeyPair()
 
     signature = pair.sign(data)
     assert pair.was_signed_by_me(signature, data)
 
 
 def test_key_pair_loaded_private_key_is_the_same_generated_earlier():
-    old_pair = crypto.KeyPair()
+    old_pair = crypto.AsymmetricKeyPair()
     old_pk = old_pair.public_to_b64()
 
     private_bytes = old_pair.private_to_pem()
-    new_pair = crypto.KeyPair.from_pem_private_bytes(private_bytes)
+    new_pair = crypto.AsymmetricKeyPair.from_pem_private_bytes(private_bytes)
 
     # the geenerated public keys should be the same
     assert old_pk == new_pair.public_to_b64()
@@ -68,7 +68,7 @@ def test_key_pair_loaded_private_key_is_the_same_generated_earlier():
 
 def test_key_pair_can_verify_a_signature_from_other_key():
     data = b'some random data'
-    pair = crypto.KeyPair()
+    pair = crypto.AsymmetricKeyPair()
     signature = pair.sign(data)
 
-    assert crypto.KeyPair.was_signed(pair.pubkey, signature, data)
+    assert crypto.AsymmetricKeyPair.was_signed(pair.pubkey, signature, data)

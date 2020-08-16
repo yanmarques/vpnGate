@@ -1,4 +1,4 @@
-from .util.crypto import KeyVerifier, KeyPair
+from .util.crypto import AsymmetricVerifier, AsymmetricKeyPair
 
 from typing import Set, Any
 from dataclasses import dataclass, field
@@ -13,7 +13,7 @@ class Peer:
     """
 
     address: str
-    keys: KeyVerifier = field(default_factory=KeyPair)
+    keys: AsymmetricVerifier = field(default_factory=AsymmetricKeyPair)
     children: Set[Any] = field(default_factory=set)
     siblings: Set[Any] = field(default_factory=set)
     parent: Any = field(default=None)
@@ -24,7 +24,7 @@ class Peer:
         Get a nice representation of the public key.
         """
 
-        return self.keys.public_to_base64().decode('utf-8')
+        return self.keys.public_to_b64().decode('utf-8')
 
     def __eq__(self, another_obj) -> bool:
         """

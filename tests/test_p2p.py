@@ -45,7 +45,8 @@ def test_peer_identifier_can_be_used_to_verify_a_signature():
     
     signature = peer.keys.sign(data)
 
-    assert crypto.KeyPair.was_signed_from_base64(peer.identifier, signature, data)
+    pubkey = crypto.AsymmetricVerifier.b64_to_public_key(peer.identifier.encode('utf-8'))
+    assert crypto.AsymmetricKeyPair.was_signed(pubkey, signature, data)
 
 
 def test_peer_comparison_against_non_peers_returns_false():
