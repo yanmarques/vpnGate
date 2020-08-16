@@ -1,6 +1,5 @@
 from . import util
 from vpngate.util import crypto
-import pytest
 
 import uuid
 import hashlib
