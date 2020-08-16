@@ -38,4 +38,4 @@ class Peer:
         key bytes are used as an integer.
         """
 
-        return int.from_bytes(self.keys.public_to_bytes(), 'little')
+        return hash(self.keys.public_to_bytes())
