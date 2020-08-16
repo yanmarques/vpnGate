@@ -16,7 +16,7 @@ class RootNode:
     """
 
     block: building.Block = field(default_factory=building.Block.genesis)
-    chains: Dict[str, List[building.Block]] = field(default_factory=dict)
+    chains: Dict[Peer, List[building.Block]] = field(default_factory=dict)
 
 
 @dataclass
