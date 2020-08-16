@@ -15,8 +15,6 @@ class BlocksManager:
     """
     
     name: str
-    difficulty: int
-
     peer: Peer
 
     transactions: list = field(default_factory=list)
@@ -53,9 +51,9 @@ class BlocksManager:
         return last_block.proof, last_block_sum
 
     def new_block(self, 
-                        proof: int, 
-                        previous_hash: str=None, 
-                        timestamp: time.time=None) -> building.Block:
+                  proof: int, 
+                  previous_hash: str=None, 
+                  timestamp: time.time=None) -> building.Block:
         """
         Create a new Block in the Blockchain
 
@@ -64,9 +62,9 @@ class BlocksManager:
         """
 
         block = building.Block(index=self.next_index,
-                      transactions=self.transactions,
-                      proof=proof,
-                      previous_hash=previous_hash or self.get_info()[1])
+                               transactions=self.transactions,
+                               proof=proof,
+                               previous_hash=previous_hash or self.get_info()[1])
 
         # Reset the current transactions
         self.transactions = []
@@ -85,6 +83,20 @@ class BlocksManager:
         self.transactions.append(content) 
         return self.next_index
 
+
+@dataclass
+class PoWBlockChain(BlocksManager):
+    difficulty: int
+
+    def new_block(self, **kwargs) -> building.Block:
+        """
+        Rewrite new_block function to allow using a proof_of_work
+        """
+
+        if 'proof' not in kwargs:
+            kwargs.update(proof=self.proof_of_work())
+        return super().new_block(**kwargs)
+
     def proof_of_work(self, last_block: building.Block=None) -> int:
         """
         Simple Proof of Work Algorithm:
@@ -99,12 +111,13 @@ class BlocksManager:
         last_proof, last_hash = self.get_info(block=last_block)
 
         proof = 0
-        while not self.is_valid_proof(proof, last_proof, last_hash):
+        while not PoWBlockChain.is_valid_proof(self.difficulty, proof, last_proof, last_hash):
             proof += 1
 
         return proof
 
-    def is_valid_proof(self, 
+    @staticmethod
+    def is_valid_proof(difficulty: int, 
                        proof: int, 
                        last_proof: int, 
                        last_hash: str) -> bool:
@@ -120,7 +133,7 @@ class BlocksManager:
         guess = f'{last_proof}{proof}{last_hash}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
 
-        return guess_hash[-self.difficulty:] == "0" * self.difficulty
+        return guess_hash[-difficulty:] == "0" * difficulty
 
     def has_valid_proof(self, proof: int) -> bool:
         """
@@ -129,5 +142,4 @@ class BlocksManager:
         :param proof: Current Proof
         """
 
-        return self.is_valid_proof(proof, *self.get_info())
-
+        return PoWBlockChain.is_valid_proof(self.difficulty, proof, *self.get_info())
