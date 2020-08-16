@@ -21,7 +21,6 @@ def get_block(**kwargs) -> Block:
 
 def get_blocks_manager(**kwargs) -> BlocksManager:
     kwargs.setdefault('name', 'foo')
-    kwargs.setdefault('difficulty', 1)
     kwargs.setdefault('peer', get_peer())
     return BlocksManager(**kwargs)
 
