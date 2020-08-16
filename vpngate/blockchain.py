@@ -1,39 +1,11 @@
-from .util import crypto
-from .tree import Tree
+from .util import crypto, building
+from .chains import Tree
 from .p2p import Peer
 
-from typing import List, Tuple
+from typing import Tuple
 from dataclasses import dataclass, field
 import hashlib
 import time
-
-
-@dataclass
-class Block:
-    """
-    This class represents each component in the chain. It holds data
-    about:
-        - last block in chain 
-        - the proof to create the block
-        - the actual content in the transactions
-        - when the block was assigned 
-    """
-
-    index: int
-    transactions: List
-    proof: int
-    previous_hash: str
-    timestamp: time.time = field(default_factory=time.time)
-
-    @classmethod
-    def genesis(cls):
-        """Create the default first block in the chain"""
-
-        return cls(index=1,
-                   transactions=[],
-                   proof=100,
-                   previous_hash='1',
-                   timestamp=-1)
 
 
 @dataclass
@@ -47,11 +19,11 @@ class BlocksManager:
 
     peer: Peer
 
-    transactions: List = field(default_factory=list)
+    transactions: list = field(default_factory=list)
     chain: Tree = field(default_factory=Tree)
 
     @property
-    def last_block(self) -> Block:
+    def last_block(self) -> building.Block:
         """
         Get the last block on the chain.
 
@@ -68,7 +40,7 @@ class BlocksManager:
 
         return self.last_block.index + 1
 
-    async def get_info(self, block: Block=None) -> Tuple(int, str):
+    def get_info(self, block: building.Block=None) -> Tuple[int, str]:
         """
         Get the last proof of work and the hash of the last
         block on the chain.
@@ -77,13 +49,13 @@ class BlocksManager:
         """
 
         last_block = block or self.last_block
-        last_block_sum = await crypto.block_hashsum(last_block) 
+        last_block_sum = crypto.block_hashsum(last_block) 
         return last_block.proof, last_block_sum
 
-    async def new_block(self, 
+    def new_block(self, 
                         proof: int, 
                         previous_hash: str=None, 
-                        timestamp: time.time=None) -> Block:
+                        timestamp: time.time=None) -> building.Block:
         """
         Create a new Block in the Blockchain
 
@@ -91,10 +63,10 @@ class BlocksManager:
         :param previous_hash: Hash of previous Block
         """
 
-        block = Block(index=self.next_index,
+        block = building.Block(index=self.next_index,
                       transactions=self.transactions,
                       proof=proof,
-                      previous_hash=previous_hash or (await self.get_info())[1])
+                      previous_hash=previous_hash or self.get_info()[1])
 
         # Reset the current transactions
         self.transactions = []
@@ -113,7 +85,7 @@ class BlocksManager:
         self.transactions.append(content) 
         return self.next_index
 
-    async def proof_of_work(self, last_block: Block=None) -> int:
+    def proof_of_work(self, last_block: building.Block=None) -> int:
         """
         Simple Proof of Work Algorithm:
 
@@ -124,10 +96,10 @@ class BlocksManager:
         :return: A valid proof of work
         """
 
-        last_proof, last_hash = await self.get_info(block=last_block)
+        last_proof, last_hash = self.get_info(block=last_block)
 
         proof = 0
-        while not await self.is_valid_proof(proof, last_proof, last_hash):
+        while not self.is_valid_proof(proof, last_proof, last_hash):
             proof += 1
 
         return proof
@@ -150,12 +122,12 @@ class BlocksManager:
 
         return guess_hash[-self.difficulty:] == "0" * self.difficulty
 
-    async def has_valid_proof(self, proof: int) -> bool:
+    def has_valid_proof(self, proof: int) -> bool:
         """
         Determine wheter the proof of work is valid against this blockchain 
  
         :param proof: Current Proof
         """
 
-        return self.is_valid_proof(proof, *await self.get_info())
+        return self.is_valid_proof(proof, *self.get_info())
 
