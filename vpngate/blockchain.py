@@ -20,7 +20,7 @@ class BlocksManager:
     transactions: list = field(default_factory=list)
     chain: Tree = field(default_factory=Tree)
 
-    block_factory: Callable = building.Block
+    block_factory: building.Block = building.Block
 
     @property
     def last_block(self) -> building.Block:
