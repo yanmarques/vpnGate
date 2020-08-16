@@ -27,7 +27,9 @@ class Block:
                         previous_hash='1',
                         timestamp=-1)
 
-        return cls(defaults.update(**kwargs))
+        defaults.update(**kwargs)
+
+        return cls(**defaults)
                 
     def to_dict(self) -> dict:
         """Return a dict representing this dataclass."""
@@ -37,9 +39,4 @@ class Block:
 
 @dataclass
 class PoWBlock(Block):
-    proof: int
-
-    @classmethod
-    def genesis(cls, **kwargs):
-        kwargs.setdefault('proof', 100)
-        return super().genesis(**kwargs)
+    proof: int = 100
