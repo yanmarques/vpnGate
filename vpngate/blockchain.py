@@ -1,4 +1,4 @@
-from .util import crypto, building
+from .util import crypto, building, exceptions
 from .chains import Tree, RootNode
 from .p2p import Peer
 
@@ -45,16 +45,13 @@ class BlocksManager:
         """
         Create a new Block in the Blockchain
 
-        :param proof: The proof given by the Proof of Work algorithm
-        :param previous_hash: Hash of previous Block
+        :param timestamp: The created time
         """
 
-        if 'previous_hash' in kwargs:
-            kwargs.setdefault('previous_hash', 
-                              crypto.block_hashsum(self.last_block))
-
         # this are overwritten
-        kwargs.update(index=self.next_index, transactions=self.transactions)
+        kwargs.update(index=self.next_index, 
+                      transactions=self.transactions,
+                      previous_hash=crypto.block_hashsum(self.last_block))
 
         block = self.block_factory(**kwargs)
 
@@ -84,7 +81,7 @@ def pow_chain():
 @dataclass
 class PoWBlockChain(BlocksManager):
     difficulty: int = 3 
-    
+
     block_factory: Callable = building.PoWBlock
     chain: Tree = field(default_factory=pow_chain)
 
@@ -92,9 +89,14 @@ class PoWBlockChain(BlocksManager):
         """
         Rewrite new_block function to allow using a proof_of_work
         """
+        
+        proof = kwargs.get('proof')
 
-        if 'proof' not in kwargs:
-            kwargs.update(proof=self.proof_of_work())
+        if not proof:
+            raise TypeError('Missing "proof" argument to create a new block!')
+        if not self.has_valid_proof(proof):
+            raise exceptions.InvalidProofOfWork(proof)
+        
         return super().new_block(**kwargs)
 
     def get_info(self, block: building.PoWBlock=None) -> Tuple[int, str]:
