@@ -57,3 +57,30 @@ def test_hashsum_with_custom_hashing_implementation():
 
     # as MD5 generates a fixed 32 bytes string
     assert len(foo_hashsum) == 32
+
+
+def test_key_pair_verifies_the_signed_data():
+    data = b'some random data'
+    pair = crypto.KeyPair()
+
+    signature = pair.sign(data)
+    assert pair.was_signed_by_me(signature, data)
+
+
+def test_key_pair_loaded_private_key_is_the_same_generated_earlier():
+    old_pair = crypto.KeyPair()
+    old_pk = old_pair.public_to_base64()
+
+    private_bytes = old_pair.private_to_pem()
+    new_pair = crypto.KeyPair.from_pem_private_bytes(private_bytes)
+    assert old_pk == new_pair.public_to_base64()
+
+
+def test_key_pair_can_verify_a_signature_from_other_key():
+    data = b'some random data'
+    pair = crypto.KeyPair()
+
+    pair_pk = pair.public_to_base64()
+    signature = pair.sign(data)
+
+    assert crypto.KeyPair.was_signed_from_base64(pair_pk, signature, data)
