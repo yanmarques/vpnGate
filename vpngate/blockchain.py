@@ -96,7 +96,7 @@ class PoWBlockChain(BlocksManager):
             kwargs.update(proof=self.proof_of_work())
         return super().new_block(**kwargs)
 
-    def get_info(self, block: building.Block=None) -> Tuple[int, str]:
+    def get_info(self, block: building.PoWBlock=None) -> Tuple[int, str]:
         """
         Get the last proof of work and the hash of the last
         block on the chain.
@@ -108,7 +108,7 @@ class PoWBlockChain(BlocksManager):
         last_block_sum = crypto.block_hashsum(last_block) 
         return last_block.proof, last_block_sum
 
-    def proof_of_work(self, last_block: building.Block=None) -> int:
+    def proof_of_work(self, last_block: building.PoWBlock=None) -> int:
         """
         Simple Proof of Work Algorithm:
 
