@@ -83,7 +83,8 @@ def pow_chain():
 
 @dataclass
 class PoWBlockChain(BlocksManager):
-    difficulty: int
+    difficulty: int = 3 
+    
     block_factory: Callable = building.PoWBlock
     chain: Tree = field(default_factory=pow_chain)
 
