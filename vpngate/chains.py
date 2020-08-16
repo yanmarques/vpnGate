@@ -1,4 +1,4 @@
-from .blockchain import Block
+from .util import building
 from .p2p import Peer
 
 from typing import Any, Dict, List
@@ -15,8 +15,8 @@ class RootNode:
     Each chain is independent and is associated with a Peer.
     """
 
-    block: Block = field(default_factory=Block.genesis)
-    chains: Dict[Peer, List[Block]] = field(default_factory=dict)
+    block: building.Block = field(default_factory=building.Block.genesis)
+    chains: Dict[str, List[building.Block]] = field(default_factory=dict)
 
 
 @dataclass
@@ -34,7 +34,7 @@ class Tree:
 
         return self.root.chains.items()
 
-    def add(self, peer: Peer, block: Block):
+    def add(self, peer: Peer, block: building.Block):
         """
         Add a new block at the peer chain, taking care when a new chain 
         should be created.
@@ -44,9 +44,9 @@ class Tree:
         """
 
         if not self.has(peer):
-            self.root.child.update(peer=[])
+            self.root.chains[peer] = []
 
-        chain = self.root.child[peer]
+        chain = self.root.chains[peer]
         chain.append(block)
 
     def get(self, peer: Peer) -> list:
@@ -56,7 +56,7 @@ class Tree:
         :param peer: The peer of the chains
         """
 
-        stock_chain = self.root.child.get(peer)
+        stock_chain = self.root.chains.get(peer, [])
         return [self.root.block] + stock_chain
 
     def has(self, peer: Peer) -> bool:
@@ -66,4 +66,4 @@ class Tree:
         :param peer: The peer to check against
         """
 
-        return peer in self.root.child
+        return peer in self.root.chains
