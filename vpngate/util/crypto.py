@@ -43,10 +43,12 @@ class KeyPair:
                                             format=serialization.PrivateFormat.PKCS8,
                                             encryption_algorithm=serialization.NoEncryption())
 
+    def public_to_bytes(self) -> bytes:
+        return self.public.public_bytes(encoding=serialization.Encoding.Raw,
+                                        format=serialization.PublicFormat.Raw)
+
     def public_to_base64(self) -> bytes:
-        raw_bytes = self.public.public_bytes(encoding=serialization.Encoding.Raw,
-                                             format=serialization.PublicFormat.Raw)
-        return base64.b64encode(raw_bytes)
+        return base64.b64encode(self.public_to_bytes())
 
     def sign(self, data: bytes) -> bytes:
         return self.__private.sign(data)
