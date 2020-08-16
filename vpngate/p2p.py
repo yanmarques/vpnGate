@@ -23,12 +23,14 @@ class Peer:
     def __eq__(self, another_obj) -> bool:
         """
         Determines wheter the given peer equals the local peer.
-        The peers identifier is used to make suck comparison.
+        The peers identifier is used to make such comparison.
 
         :param another_obj: Some object to compare 
         """
 
-        return self.identifier == another_peer.identifier
+        if isinstance(another_obj, Peer):
+            return self.identifier == another_obj.identifier
+        return False
 
     def __hash__(self) -> int:
         """
