@@ -1,5 +1,5 @@
 from vpngate.util.building import Block
-from vpngate.blockchain import BlocksManager
+from vpngate.blockchain import BlocksManager, PoWBlockChain
 from vpngate.p2p import Peer
 
 
@@ -28,3 +28,9 @@ def get_blocks_manager(**kwargs) -> BlocksManager:
 def get_peer(**kwargs) -> Peer:
     kwargs.setdefault('address', 'http://127.0.0.1')
     return Peer(**kwargs)
+
+
+def get_pow_blockchain(**kwargs) -> PoWBlockChain:
+    kwargs.setdefault('name', 'foo')
+    kwargs.setdefault('peer', get_peer())
+    return PoWBlockChain(**kwargs)
