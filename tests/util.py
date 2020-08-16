@@ -1,4 +1,6 @@
 from vpngate.util.building import Block
+from vpngate.blockchain import BlocksManager
+from vpngate.p2p import Peer
 
 
 def assert_is_genesis_block(block):
@@ -15,3 +17,15 @@ def get_block(**kwargs) -> Block:
     kwargs.setdefault('previous_hash', '321')
     kwargs.setdefault('timestamp', None)
     return Block(**kwargs)
+
+
+def get_blocks_manager(**kwargs) -> BlocksManager:
+    kwargs.setdefault('name', 'foo')
+    kwargs.setdefault('difficulty', 1)
+    kwargs.setdefault('peer', get_peer())
+    return BlocksManager(**kwargs)
+
+
+def get_peer(**kwargs) -> Peer:
+    kwargs.setdefault('address', 'http://127.0.0.1')
+    return Peer(**kwargs)
