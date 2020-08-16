@@ -20,8 +20,20 @@ def block_hashsum(block: building.Block, impl=hashlib.sha256):
 
 
 class KeyVerifier:
-    def __init__(self, public: ed25519.Ed25519PublicKey):
-        self.public = public
+    """
+    Holds a the asymmetric public key, used to verify signatures. It also contains 
+    methods to dump and load public keys.
+
+    Usage:
+        >>> from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+        >>> sk = Ed25519PrivateKey.generate()
+        >>> pk = KeyVerifier(sk.public_key())
+        >>> pk.public_to_b64()
+        b'RuTGMuR+93aIVQLsa0bZzJOR7QUXNCyPDpx6qAUMB6g='
+    """
+
+    def __init__(self, pubkey: ed25519.Ed25519PublicKey):
+        self.pubkey = pubkey
 
     @classmethod
     def from_public_b64(cls, public_b64: bytes):
@@ -36,7 +48,7 @@ class KeyVerifier:
         Get the public key as UTF-8 bytes.
         """
 
-        return self.public.public_bytes(encoding=serialization.Encoding.Raw,
+        return self.pubkey.public_bytes(encoding=serialization.Encoding.Raw,
                                         format=serialization.PublicFormat.Raw)
 
     def public_to_b64(self) -> bytes:
@@ -85,7 +97,7 @@ class KeyVerifier:
         :param data: Data to check against the signature
         """
 
-        return KeyPair.was_signed(self.public, signature, data)
+        return KeyPair.was_signed(self.pubkey, signature, data)
 
 
 class KeyPair(KeyVerifier):
@@ -103,10 +115,10 @@ class KeyPair(KeyVerifier):
     """
 
     def __init__(self, private: ed25519.Ed25519PrivateKey=None):
-        self.__private = private or ed25519.Ed25519PrivateKey.generate()
+        self.__privkey = private or ed25519.Ed25519PrivateKey.generate()
 
         # the public key is always generated from the private key
-        super().__init__(self.__private.public_key())
+        super().__init__(self.__privkey.public_key())
 
     @classmethod
     def from_pem_private_bytes(cls, private: bytes):
@@ -125,7 +137,7 @@ class KeyPair(KeyVerifier):
         Get the private key in the PEM encoding, using the PKCS8 format in plain text.
         """
 
-        return self.__private.private_bytes(encoding=serialization.Encoding.PEM,
+        return self.__privkey.private_bytes(encoding=serialization.Encoding.PEM,
                                             format=serialization.PrivateFormat.PKCS8,
                                             encryption_algorithm=serialization.NoEncryption())
 
@@ -136,4 +148,4 @@ class KeyPair(KeyVerifier):
         :param data: The data to sign
         """
 
-        return self.__private.sign(data)
+        return self.__privkey.sign(data)
