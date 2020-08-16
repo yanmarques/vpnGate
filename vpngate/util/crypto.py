@@ -1,4 +1,4 @@
-import building
+from vpngate.util import building
 
 import json
 import secrets
