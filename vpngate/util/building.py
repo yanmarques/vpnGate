@@ -7,7 +7,8 @@ class Block:
     """
     This class represents each component in the chain. It holds data
     about:
-        - last block in chain 
+        - the index number of the current block
+        - hash of the last block in chain 
         - the actual content in the transactions
         - when the block was assigned 
     """
