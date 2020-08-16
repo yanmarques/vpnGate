@@ -1,18 +1,8 @@
 from . import util
 from vpngate.util import crypto
 
-import uuid
+from unittest.mock import Mock
 import hashlib
-
-
-def test_generate_valid_uuid_size():
-    rand_uuid = crypto.hex_uuid()
-    assert len(rand_uuid) == 32
-
-
-def test_generate_valid_hexadecimal_value():
-    rand_uuid = crypto.hex_uuid()
-    int(rand_uuid, 16)
 
 
 def test_hashsum_of_similar_objects_gives_the_same_sum():
@@ -36,15 +26,13 @@ def test_hashsum_of_non_similar_objects_gives_different_sums():
 
 
 def test_hashsum_of_unsorted_keys_gives_the_same_sum():
-    class fake_block:
-        items_to_ret = [
-            dict(something=True, another='baz'),
-            dict(another='baz', something=True)
-        ]
-        
-        @staticmethod
-        def to_dict():
-            return fake_block.items_to_ret.pop()
+    items_to_ret = [
+        dict(something=True, another='baz'),
+        dict(another='baz', something=True)
+    ]
+    
+    fake_block = Mock
+    fake_block.to_dict = items_to_ret.pop
 
     foo_hashsum = crypto.block_hashsum(fake_block)
     bar_hashsum = crypto.block_hashsum(fake_block)
@@ -73,6 +61,8 @@ def test_key_pair_loaded_private_key_is_the_same_generated_earlier():
 
     private_bytes = old_pair.private_to_pem()
     new_pair = crypto.KeyPair.from_pem_private_bytes(private_bytes)
+
+    # the geenerated public keys should be the same
     assert old_pk == new_pair.public_to_base64()
 
 
