@@ -1,16 +1,16 @@
 from .util import building
 from .p2p import Peer
 
-from typing import Any, Dict, List
+from typing import Dict, List
 from dataclasses import dataclass, field
 
 
 @dataclass
 class RootNode:
     """
-    The RootNode is the first block in the tree chain. By default the block is the genesis
-    block and it does not have a parent related with, but may have a bunch of children, also 
-    called chains.
+    The RootNode is the first block in the tree chain. By default the block
+    is the genesis block and it does not have a parent related with, but may
+    have a bunch of children, also called chains.
 
     Each chain is independent and is associated with a Peer.
     """
@@ -22,7 +22,7 @@ class RootNode:
 @dataclass
 class Tree:
     root: RootNode = field(default_factory=RootNode)
-    
+
     @property
     def length(self) -> int:
         """Determine the length of chains of the root node."""
@@ -36,9 +36,9 @@ class Tree:
 
     def add(self, peer: Peer, block: building.Block):
         """
-        Add a new block at the peer chain, taking care when a new chain 
+        Add a new block at the peer chain, taking care when a new chain
         should be created.
-        
+
         :param peer: A peer responsable of the block
         :param block: The next block with data
         """
@@ -52,7 +52,7 @@ class Tree:
     def get(self, peer: Peer) -> list:
         """
         Return the full chain of the given peer
-        
+
         :param peer: The peer of the chains
         """
 
