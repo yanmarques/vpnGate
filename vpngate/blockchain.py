@@ -2,18 +2,18 @@ from .util import crypto, building, exceptions
 from .chains import Tree, RootNode
 from .p2p import Peer
 
-from typing import Tuple, Callable
+from typing import Tuple
 from dataclasses import dataclass, field
 import hashlib
-import time
 
 
 @dataclass
 class BlocksManager:
     """
-    The base blockchain class that handles running and verifying blocks of data.
+    The base blockchain class that handles running and verifying blocks
+    of data.
     """
-    
+
     name: str
     peer: Peer
 
@@ -29,7 +29,7 @@ class BlocksManager:
 
         :return: <dict>
         """
-        
+
         return self.chain.get(self.peer)[-1]
 
     @property
@@ -40,7 +40,6 @@ class BlocksManager:
 
         return self.last_block.index + 1
 
-
     def new_block(self, **kwargs) -> building.Block:
         """
         Create a new Block in the Blockchain
@@ -49,7 +48,7 @@ class BlocksManager:
         """
 
         # this are overwritten
-        kwargs.update(index=self.next_index, 
+        kwargs.update(index=self.next_index,
                       transactions=self.transactions,
                       previous_hash=crypto.block_hashsum(self.last_block))
 
@@ -68,8 +67,8 @@ class BlocksManager:
         :param content: Content of new transaction
         :return: The index of the Block that will hold this transaction
         """
-        
-        self.transactions.append(content) 
+
+        self.transactions.append(content)
         return self.next_index
 
 
@@ -84,7 +83,7 @@ def pow_chain() -> Tree:
 
 @dataclass
 class PoWBlockChain(BlocksManager):
-    difficulty: int = field(default=3) 
+    difficulty: int = field(default=3)
 
     block_factory: building.Block = field(default=building.PoWBlock)
     chain: Tree = field(default_factory=pow_chain)
@@ -93,17 +92,17 @@ class PoWBlockChain(BlocksManager):
         """
         Rewrite new_block function to allow using a proof_of_work
         """
-        
+
         proof = kwargs.get('proof')
 
         if not proof:
             raise TypeError('Missing "proof" argument to create a new block!')
         if not self.has_valid_proof(proof):
             raise exceptions.InvalidProofOfWork(proof)
-        
+
         return super().new_block(**kwargs)
 
-    def get_info(self, block: building.PoWBlock=None) -> Tuple[int, str]:
+    def get_info(self, block: building.PoWBlock = None) -> Tuple[int, str]:
         """
         Get the last proof of work and the hash of the last
         block on the chain.
@@ -112,16 +111,16 @@ class PoWBlockChain(BlocksManager):
         """
 
         last_block = block or self.last_block
-        last_block_sum = crypto.block_hashsum(last_block) 
+        last_block_sum = crypto.block_hashsum(last_block)
         return last_block.proof, last_block_sum
 
-    def proof_of_work(self, last_block: building.PoWBlock=None) -> int:
+    def proof_of_work(self, last_block: building.PoWBlock = None) -> int:
         """
         Simple Proof of Work Algorithm:
 
          - Find a number p' such that hash(pp') contains leading 4 zeroes
          - Where p is the previous proof, and p' is the new proof
-         
+
         :param last_block: last Block
         :return: A valid proof of work
         """
@@ -129,19 +128,22 @@ class PoWBlockChain(BlocksManager):
         last_proof, last_hash = self.get_info(block=last_block)
 
         proof = 0
-        while not PoWBlockChain.is_valid_proof(self.difficulty, proof, last_proof, last_hash):
+        while not PoWBlockChain.is_valid_proof(self.difficulty,
+                                               proof,
+                                               last_proof,
+                                               last_hash):
             proof += 1
 
         return proof
 
     @staticmethod
-    def is_valid_proof(difficulty: int, 
-                       proof: int, 
-                       last_proof: int, 
+    def is_valid_proof(difficulty: int,
+                       proof: int,
+                       last_proof: int,
                        last_hash: str) -> bool:
         """
-        Determine wheter the proof of work is valid 
- 
+        Determine wheter the proof of work is valid
+
         :param last_proof: Previous Proof
         :param proof: Current Proof
         :param last_hash: The hash of the Previous Block
@@ -155,9 +157,12 @@ class PoWBlockChain(BlocksManager):
 
     def has_valid_proof(self, proof: int) -> bool:
         """
-        Determine wheter the proof of work is valid against this blockchain 
- 
+        Determine wheter the proof of work is valid against this
+        blockchain.
+
         :param proof: Current Proof
         """
 
-        return PoWBlockChain.is_valid_proof(self.difficulty, proof, *self.get_info())
+        return PoWBlockChain.is_valid_proof(self.difficulty,
+                                            proof,
+                                            *self.get_info())

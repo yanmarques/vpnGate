@@ -8,9 +8,9 @@ class Block:
     This class represents each component in the chain. It holds data
     about:
         - the index number of the current block
-        - hash of the last block in chain 
+        - hash of the last block in chain
         - the actual content in the transactions
-        - when the block was assigned 
+        - when the block was assigned
     """
 
     index: int
@@ -30,7 +30,7 @@ class Block:
         defaults.update(**kwargs)
 
         return cls(**defaults)
-                
+
     def to_dict(self) -> dict:
         """Return a dict representing this dataclass."""
 

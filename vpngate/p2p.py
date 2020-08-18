@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 class Peer:
     """
     Class used to hold information about a remote or local peer. It may also
-    be used to contact a peer using it's address. Altough, it is uniquely 
+    be used to contact a peer using it's address. Altough, it is uniquely
     identified by it's public key, also used for comparison operations.
     """
 
@@ -31,7 +31,7 @@ class Peer:
         Determines wheter the given peer equals the local peer.
         The peers identifier is used to make such comparison.
 
-        :param another_obj: Some object to compare 
+        :param another_obj: Some object to compare
         """
 
         if isinstance(another_obj, Peer):
